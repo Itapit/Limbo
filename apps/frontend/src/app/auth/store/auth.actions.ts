@@ -1,8 +1,21 @@
-import { createAction, props } from '@ngrx/store';
-import { AuthEntity } from './auth.models';
+import { LoginRequest, RegisterRequest } from '@limbo/common';
+import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
-export const initAuth = createAction('[Auth Page] Init');
+export const AuthActions = createActionGroup({
+  source: 'Auth',
+  events: {
+    'Login Start': props<{ loginRequest: LoginRequest }>(),
+    'Login Success': emptyProps(),
+    'Login Failure': props<{ error: string }>(),
 
-export const loadAuthSuccess = createAction('[Auth/API] Load Auth Success', props<{ auth: AuthEntity[] }>());
+    'Register start': props<{ registerRequest: RegisterRequest }>(),
+    'Register Success': emptyProps(),
+    'Register Failure': props<{ error: string }>(),
 
-export const loadAuthFailure = createAction('[Auth/API] Load Auth Failure', props<{ error: any }>());
+    'Logout Start': emptyProps(),
+    'Logout Success': emptyProps(),
+    'Logout Failure': props<{ error: string }>(),
+
+    'Clear Error': emptyProps(),
+  },
+});

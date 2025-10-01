@@ -1,38 +1,17 @@
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreRouterConnectingModule } from '@ngrx/router-store';
-import { StoreModule } from '@ngrx/store';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import Lara from '@primeuix/themes/lara';
 import { providePrimeNG } from 'primeng/config';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
 import { AuthModule } from './auth/auth-module';
+import { AppStoreModule } from './state/app-store.module';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    RouterModule.forRoot(appRoutes),
-    AuthModule,
-    EffectsModule.forRoot([]),
-    StoreDevtoolsModule.instrument({ logOnly: !isDevMode() }),
-    StoreModule.forRoot(
-      {},
-      {
-        metaReducers: [],
-        runtimeChecks: {
-          strictActionImmutability: true,
-          strictStateImmutability: true,
-        },
-      }
-    ),
-    StoreRouterConnectingModule.forRoot(),
-  ],
+  imports: [BrowserModule, BrowserAnimationsModule, RouterModule.forRoot(appRoutes), AuthModule, AppStoreModule],
   bootstrap: [AppComponent],
   providers: [
     providePrimeNG({

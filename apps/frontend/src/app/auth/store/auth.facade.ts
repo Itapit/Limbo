@@ -1,26 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 
-import * as AuthActions from './auth.actions';
-import * as AuthSelectors from './auth.selectors';
+import { AuthActions } from './auth.actions';
+import { selectAuthError, selectAuthLoading, selectEmail, selectRole, selectUsername } from './auth.selectors';
+import { AuthState } from './auth.state';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AuthFacade {
-  private readonly store = inject(Store);
+  private readonly store = inject<Store<{ auth: AuthState }>>(Store);
 
-  /**
-   * Combine pieces of state using createSelector,
-   * and expose them as observables through the facade.
-   */
-  loaded$ = this.store.pipe(select(AuthSelectors.selectAuthLoaded));
-  allAuth$ = this.store.pipe(select(AuthSelectors.selectAllAuth));
-  selectedAuth$ = this.store.pipe(select(AuthSelectors.selectEntity));
+  loading$ = this.store.select(selectAuthLoading);
+  error$ = this.store.select(selectAuthError);
+  role$ = this.store.select(selectRole);
+  username$ = this.store.select(selectUsername);
+  email$ = this.store.select(selectEmail);
 
-  /**
-   * Use the initialization action to perform one
-   * or more tasks in your Effects.
-   */
-  init() {
-    this.store.dispatch(AuthActions.initAuth());
+  logout() {
+    this.store.dispatch(AuthActions.logoutStart());
   }
 }
