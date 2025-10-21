@@ -8,11 +8,11 @@ export const AuthActions = createActionGroup({
   events: {
     // login / register
     'Login Start': props<{ loginRequest: LoginRequest }>(),
-    'Login Success': props<{ accessToken: AccessTokenInfo }>, // also receive new RT as cookie
+    'Login Success': props<{ accessToken: AccessTokenInfo }>(), // also receive new RT as cookie
     'Login Failure': props<{ error: string }>(),
 
     'Register Start': props<{ registerRequest: RegisterRequest }>(),
-    'Register Success': props<{ accessToken: AccessTokenInfo }>, // also receive new RT as cookie
+    'Register Success': props<{ accessToken: AccessTokenInfo }>(), // also receive new RT as cookie
     'Register Failure': props<{ error: string }>(),
 
     // -------- Refresh flow --------

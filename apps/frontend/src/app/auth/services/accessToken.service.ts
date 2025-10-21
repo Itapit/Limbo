@@ -3,7 +3,7 @@ import { AccessTokenInfo } from '@limbo/common';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class TokenService {
+export class AccessTokenService {
   private accessToken$ = new BehaviorSubject<string | null>(null);
   private expiresAt: number | null = null;
 
