@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@limbo/common": ["libs/common/src/index.ts"]
+      "@limbo/api-clients": ["libs/backend/api-clients/src/index.ts"],
+      "@limbo/common": ["libs/common/src/index.ts"],
+      "@limbo/messaging-config": ["libs/backend/messaging-config/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
