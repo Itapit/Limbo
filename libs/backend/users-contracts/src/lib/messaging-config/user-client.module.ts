@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { USER_CONFIG, USER_SERVICE } from './constants';
+import { USER_CONFIG, USER_SERVICE } from './user-constants';
 
 @Module({
   imports: [
@@ -15,6 +15,6 @@ import { USER_CONFIG, USER_SERVICE } from './constants';
       },
     ]),
   ],
-  exports: [ClientsModule, USER_SERVICE],
+  exports: [ClientsModule],
 })
 export class UserClientModule {}

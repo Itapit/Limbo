@@ -17,7 +17,7 @@
     "paths": {
       "@limbo/api-clients": ["libs/backend/api-clients/src/index.ts"],
       "@limbo/common": ["libs/common/src/index.ts"],
-      "@limbo/messaging-config": ["libs/backend/messaging-config/src/index.ts"]
+      "@limbo/users-contracts": ["libs/backend/users-contracts/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
