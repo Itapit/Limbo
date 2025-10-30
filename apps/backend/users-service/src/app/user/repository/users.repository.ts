@@ -1,4 +1,4 @@
-import { CreateUserRepoDto } from '../dtos/create-user.dto';
+import { CreateUserRepoDto } from '../dtos/create-user-repo.dto';
 import { UserSchema } from './user.schema';
 
 //This abstract class defines the contract for our UsersRepository

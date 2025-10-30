@@ -1,4 +1,4 @@
-import { UserRole, UserStatus } from '@limbo/users-contracts';
+import { UserRole, UserStatus } from '@limbo/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
