@@ -8,7 +8,7 @@ import { UsersRepository } from './repository/users.repository';
 
 @Injectable()
 export class UserService {
-  private readonly HASH_ROUNDS = 10;
+  readonly HASH_ROUNDS = 10;
 
   constructor(private readonly usersRepository: UsersRepository) {}
 

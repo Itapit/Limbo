@@ -1,4 +1,4 @@
-import { AuthLoginPayload, USER_PATTERNS } from '@limbo/users-contracts';
+import { AuthLoginPayload, CompleteSetupPayload, USER_PATTERNS } from '@limbo/users-contracts';
 import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
@@ -17,5 +17,11 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   handleLogin(@Payload() payload: AuthLoginPayload) {
     return this.authService.login(payload);
+  }
+
+  @MessagePattern(USER_PATTERNS.AUTH_COMPLETE_SETUP)
+  @UsePipes(new ValidationPipe())
+  handleCompleteSetup(@Payload() payload: CompleteSetupPayload) {
+    return this.authService.completeUserSetup(payload);
   }
 }

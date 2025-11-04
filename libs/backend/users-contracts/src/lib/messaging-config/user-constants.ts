@@ -10,4 +10,5 @@ export const USER_PATTERNS = {
   GET_USER_BY_ID: 'cmd:get_user_by_id',
   PING: 'cmd:ping',
   AUTH_LOGIN: 'cmd:auth_login',
+  AUTH_COMPLETE_SETUP: 'cmd:auth_complete_setup',
 };

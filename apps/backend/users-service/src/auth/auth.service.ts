@@ -1,6 +1,17 @@
 import { UserRole, UserStatus } from '@limbo/common';
-import { AuthLoginPayload, AuthLoginResponseDto, PendingLoginResponseDto } from '@limbo/users-contracts';
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  AuthLoginPayload,
+  AuthLoginResponseDto,
+  CompleteSetupPayload,
+  PendingLoginResponseDto,
+} from '@limbo/users-contracts';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
@@ -34,6 +45,31 @@ export class AuthService {
     }
     // Handle ACTIVE user flow
     return this.grantUserTokens(user);
+  }
+
+  async completeUserSetup(payload: CompleteSetupPayload): Promise<AuthLoginResponseDto> {
+    const { userId, password } = payload;
+
+    const user = await this.usersRepository.findById(userId);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('User not found').getResponse());
+    }
+    if (user.status !== UserStatus.PENDING) {
+      throw new RpcException(new ForbiddenException('User is already active').getResponse());
+    }
+
+    const hashedPassword = await bcrypt.hash(password, this.userService.HASH_ROUNDS);
+    const updatedUser = await this.usersRepository.update(user.id, {
+      password: hashedPassword,
+      status: UserStatus.ACTIVE,
+    });
+
+    if (!updatedUser) {
+      throw new RpcException(new InternalServerErrorException('Failed to activate user').getResponse());
+    }
+
+    return this.grantUserTokens(updatedUser);
   }
 
   /**
