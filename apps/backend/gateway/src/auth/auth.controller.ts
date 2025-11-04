@@ -4,7 +4,7 @@ import { AuthLoginResponseDto } from '@limbo/users-contracts';
 import { Body, Controller, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { CompleteSetupDto } from '../users/dtos/complete-setup.dto';
+import { CompleteSetupDto } from '../auth/dtos/complete-setup.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { PendingJwtGuard } from './guards/pending-jwt.guard';

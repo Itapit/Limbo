@@ -1,4 +1,4 @@
-import { UserDto } from '../base';
+import { UserDto } from '../users/user.dto';
 
 export interface LoginResponse {
   accessToken: string;

@@ -17,7 +17,6 @@ export class UsersController {
   @Post()
   @UseGuards(JwtAuthGuard, AdminGuard)
   async adminInviteUser(@Body() dto: AdminCreateUserDto, @Request() req): Promise<UserDto> {
-    // Get the admin's ID from the token (added by JwtAuthGuard)
     const adminId = req.user.id;
 
     return this.usersService.adminInviteUser(adminId, dto);

@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { AccessJwtStrategy } from './strategies/access-jwt.strategy';
 import { PendingJwtStrategy } from './strategies/pending-jwt.strategy';
 
 @Module({
@@ -22,7 +22,7 @@ import { PendingJwtStrategy } from './strategies/pending-jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PendingJwtStrategy],
+  providers: [AuthService, AccessJwtStrategy, PendingJwtStrategy],
   exports: [PassportModule],
 })
 export class AuthModule {}
