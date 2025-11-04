@@ -9,4 +9,5 @@ export const USER_PATTERNS = {
   CREATE_USER: 'cmd:create_user',
   GET_USER_BY_ID: 'cmd:get_user_by_id',
   PING: 'cmd:ping',
+  AUTH_LOGIN: 'cmd:auth_login',
 };
