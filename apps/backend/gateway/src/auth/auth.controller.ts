@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CompleteSetupDto, LoginDto } from './dtos';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PendingJwtGuard } from './guards/pending-jwt.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import ms = require('ms');
@@ -123,5 +124,21 @@ export class AuthController {
     });
 
     return { statusCode: HttpStatus.OK, message: 'Logged out successfully' };
+  }
+
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  async logoutAll(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const { id: userId } = req.user;
+
+    await this.authService.logoutAll(userId);
+
+    res.clearCookie('refresh-token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+
+    return { statusCode: HttpStatus.OK, message: 'Logged out from all devices' };
   }
 }

@@ -1,5 +1,6 @@
 import {
   AuthLoginPayload,
+  AuthLogoutAllPayload,
   AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
@@ -41,5 +42,11 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   handleLogout(@Payload() payload: AuthLogoutPayload) {
     return this.authService.logout(payload);
+  }
+
+  @MessagePattern(USER_PATTERNS.AUTH_LOGOUT_ALL)
+  @UsePipes(new ValidationPipe())
+  handleLogoutAll(@Payload() payload: AuthLogoutAllPayload) {
+    return this.authService.logoutAll(payload);
   }
 }

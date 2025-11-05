@@ -1,6 +1,7 @@
 import {
   AuthLoginPayload,
   AuthLoginResponseDto,
+  AuthLogoutAllPayload,
   AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
@@ -43,5 +44,10 @@ export class AuthService {
   async logout(jti: string) {
     const payload: AuthLogoutPayload = { jti };
     return this.usersClient.send(USER_PATTERNS.AUTH_LOGOUT, payload).toPromise();
+  }
+
+  async logoutAll(userId: string) {
+    const payload: AuthLogoutAllPayload = { userId };
+    return this.usersClient.send(USER_PATTERNS.AUTH_LOGOUT_ALL, payload).toPromise();
   }
 }

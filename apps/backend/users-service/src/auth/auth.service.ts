@@ -3,6 +3,7 @@ import { UserDto, UserRole, UserStatus } from '@limbo/common';
 import {
   AuthLoginPayload,
   AuthLoginResponseDto,
+  AuthLogoutAllPayload,
   AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
@@ -102,6 +103,19 @@ export class AuthService {
       return { success: true };
     } catch (e) {
       console.error('Error during logout:', e);
+      return { success: true };
+    }
+  }
+
+  /**
+   * Deletes ALL refresh tokens for a user.
+   */
+  async logoutAll(payload: AuthLogoutAllPayload): Promise<{ success: true }> {
+    try {
+      await this.refreshTokenRepo.deleteAllForUser(payload.userId);
+      return { success: true };
+    } catch (e) {
+      console.error('Error during logout-all:', e);
       return { success: true };
     }
   }
