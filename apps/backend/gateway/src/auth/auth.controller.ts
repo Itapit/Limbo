@@ -1,7 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthRefreshResponse, LoginResponse, PendingLoginResponse } from '@limbo/common';
 import { AuthLoginResponseDto } from '@limbo/users-contracts';
-import { Body, Controller, Headers, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -96,5 +107,21 @@ export class AuthController {
     return {
       accessToken: result.accessToken,
     };
+  }
+
+  @Post('logout')
+  @UseGuards(RefreshTokenGuard)
+  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const { jti } = req.user;
+
+    await this.authService.logout(jti);
+
+    res.clearCookie('refresh-token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+
+    return { statusCode: HttpStatus.OK, message: 'Logged out successfully' };
   }
 }

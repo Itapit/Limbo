@@ -1,4 +1,10 @@
-import { AuthLoginPayload, AuthRefreshPayload, CompleteSetupPayload, USER_PATTERNS } from '@limbo/users-contracts';
+import {
+  AuthLoginPayload,
+  AuthLogoutPayload,
+  AuthRefreshPayload,
+  CompleteSetupPayload,
+  USER_PATTERNS,
+} from '@limbo/users-contracts';
 import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
@@ -29,5 +35,11 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   handleRefresh(@Payload() payload: AuthRefreshPayload) {
     return this.authService.refreshAccessToken(payload);
+  }
+
+  @MessagePattern(USER_PATTERNS.AUTH_LOGOUT)
+  @UsePipes(new ValidationPipe())
+  handleLogout(@Payload() payload: AuthLogoutPayload) {
+    return this.authService.logout(payload);
   }
 }

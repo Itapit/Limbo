@@ -1,6 +1,7 @@
 import {
   AuthLoginPayload,
   AuthLoginResponseDto,
+  AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
   USER_PATTERNS,
@@ -37,5 +38,10 @@ export class AuthService {
     const payload: AuthRefreshPayload = { userId, jti, userAgent };
 
     return this.usersClient.send<AuthLoginResponseDto>(USER_PATTERNS.AUTH_REFRESH, payload).toPromise();
+  }
+
+  async logout(jti: string) {
+    const payload: AuthLogoutPayload = { jti };
+    return this.usersClient.send(USER_PATTERNS.AUTH_LOGOUT, payload).toPromise();
   }
 }

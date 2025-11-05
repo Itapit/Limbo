@@ -3,6 +3,7 @@ import { UserDto, UserRole, UserStatus } from '@limbo/common';
 import {
   AuthLoginPayload,
   AuthLoginResponseDto,
+  AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
   PendingLoginResponseDto,
@@ -89,6 +90,19 @@ export class AuthService {
     } catch (e) {
       console.error('Error during token granting:', e);
       throw new RpcException(new InternalServerErrorException('Could not grant tokens').getResponse());
+    }
+  }
+
+  /**
+   * Deletes a single refresh token from the database.
+   */
+  async logout(payload: AuthLogoutPayload): Promise<{ success: true }> {
+    try {
+      await this.refreshTokenRepo.delete(payload.jti);
+      return { success: true };
+    } catch (e) {
+      console.error('Error during logout:', e);
+      return { success: true };
     }
   }
 
