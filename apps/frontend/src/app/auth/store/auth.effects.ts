@@ -1,14 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { catchError, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
 
 import { Router } from '@angular/router';
-import { AccessTokenInfo } from '@limbo/common';
-import { Action, ActionCreator } from '@ngrx/store';
+import { isPendingLoginResponse } from '@limbo/common';
+import { Action, ActionCreator, Store } from '@ngrx/store';
 import { AccessTokenService } from '../services/accessToken.service';
 import { AuthService } from '../services/auth.service';
 import { AuthActions } from './auth.actions';
+import { selectUser } from './auth.selectors';
+import { AuthState } from './auth.state';
 
 // Define a type for the action creators that take an error string
 type AuthFailureActionCreator = ActionCreator<string, (props: { error: string }) => { error: string } & Action>;
@@ -19,6 +21,7 @@ export class AuthEffects {
   private authService = inject(AuthService);
   private tokenService = inject(AccessTokenService);
   private router = inject(Router);
+  private store = inject(Store<AuthState>);
 
   // Helper function to map HTTP errors to an Ngrx failure action.
   private handleApiError(error: HttpErrorResponse, action: AuthFailureActionCreator) {
@@ -27,122 +30,122 @@ export class AuthEffects {
   }
 
   // =================================================================
-  // LOGIN FLOW
+  // LOGIN & COMPLETE SETUP FLOWS
   // =================================================================
-
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginStart),
-      switchMap(({ loginRequest }) =>
-        this.authService.login(loginRequest).pipe(
-          map((accessToken: AccessTokenInfo) => AuthActions.loginSuccess({ accessToken })),
+      switchMap(({ request }) =>
+        this.authService.login(request).pipe(
+          map((response) => AuthActions.loginSuccess({ response })),
           catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.loginFailure))
         )
       )
     )
   );
 
-  // =================================================================
-  // REGISTER FLOW
-  // =================================================================
-
-  register$ = createEffect(() =>
+  completeSetup$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.registerStart),
-      switchMap(({ registerRequest }) =>
-        this.authService.register(registerRequest).pipe(
-          map((accessToken: AccessTokenInfo) => AuthActions.registerSuccess({ accessToken })),
-          catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.registerFailure))
+      ofType(AuthActions.completeSetupStart),
+      switchMap(({ request }) =>
+        this.authService.completeSetup(request).pipe(
+          map((response) => AuthActions.loginSuccess({ response })), // Dispatches LoginSuccess
+          catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.completeSetupFailure))
         )
       )
     )
   );
 
-  // =================================================================
-  // LOGIN/REGISTER SUCCESS - Handle token and trigger profile load
-  // =================================================================
-
-  loginRegisterSuccess$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.loginSuccess, AuthActions.registerSuccess),
-      // Tap into the stream to save the token in the service
-      tap(({ accessToken }) => this.tokenService.setToken(accessToken)),
-      // Map the success action to trigger the load of the current user's profile
-      map(() => AuthActions.loadMeStart())
-    )
-  );
-
-  // =================================================================
-  // REFRESH FLOW (Triggered on 401 interceptor or app bootstrap)
-  // =================================================================
-
-  refresh$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.refreshStart),
-      switchMap(() =>
-        this.authService.refresh().pipe(
-          map((accessToken: AccessTokenInfo) => AuthActions.refreshSuccess({ accessToken })),
-          catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.refreshFailure))
-        )
-      )
-    )
-  );
-
-  refreshSuccess$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.refreshSuccess),
-      // Save the new token
-      tap(({ accessToken }) => this.tokenService.setToken(accessToken))
-    )
-  );
-
-  refreshFailure$ = createEffect(
+  loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthActions.refreshFailure),
-        tap(() => {
-          this.tokenService.clear();
-          this.router.navigate(['auth/login']);
+        ofType(AuthActions.loginSuccess),
+        tap(({ response }) => {
+          if (isPendingLoginResponse(response)) {
+            this.tokenService.setToken(response.pendingToken);
+            this.router.navigate(['/complete-setup']);
+            return;
+          }
+          // It's a LoginResponse
+          this.tokenService.setToken(response.accessToken);
+          this.router.navigate(['/']);
         })
       ),
     { dispatch: false }
   );
 
   // =================================================================
-  // load profile FLOW
+  // REFRESH & LOAD ME FLOWS
   // =================================================================
+  refresh$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.refreshStart), // Triggered by Init OR interceptor
+      switchMap(() =>
+        this.authService.refresh().pipe(
+          map((response) => AuthActions.refreshSuccess({ response })),
+          catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.refreshFailure))
+        )
+      )
+    )
+  );
 
-  //TODO load profile session
+  /**
+   * This effect runs AFTER a successful refresh.
+   * It checks the state to see if we need to load the user.
+   */
+  refreshSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.refreshSuccess),
+      tap(({ response }) => this.tokenService.setToken(response.accessToken)),
+      withLatestFrom(this.store.select(selectUser)),
+      switchMap(([, user]) => {
+        // If user is already in state (interceptor refresh), do nothing.
+        if (user) {
+          return of();
+        }
+        // If user is null (F5 refresh), dispatch Load Me.
+        return of(AuthActions.loadMeStart());
+      })
+    )
+  );
+
+  loadMe$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loadMeStart),
+      switchMap(() =>
+        this.authService.getMe().pipe(
+          map((user) => AuthActions.loadMeSuccess({ user })),
+          catchError((error: HttpErrorResponse) => this.handleApiError(error, AuthActions.loadMeFailure))
+        )
+      )
+    )
+  );
 
   // =================================================================
-  // LOGOUT FLOW
+  // LOGOUT & FAILURE FLOWS
   // =================================================================
-
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logoutStart),
       switchMap(() =>
         this.authService.logout().pipe(
           map(() => AuthActions.logoutSuccess()),
-          catchError((error: HttpErrorResponse) => {
-            console.error('Logout API failed but forcing client logout:', error);
-            return of(AuthActions.logoutSuccess());
-          })
+          catchError(() => of(AuthActions.logoutSuccess())) // Always logout locally
         )
       )
     )
   );
 
-  logoutSuccess$ = createEffect(
-    () => {
-      return this.actions$.pipe(
-        ofType(AuthActions.logoutSuccess),
+  // This effect groups all "session end" events
+  sessionEnd$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logoutSuccess, AuthActions.refreshFailure, AuthActions.loadMeFailure),
         tap(() => {
           this.tokenService.clear();
-          this.router.navigate(['/login']);
+          this.router.navigate(['/auth/login']);
         })
-      );
-    },
+      ),
     { dispatch: false }
   );
 }

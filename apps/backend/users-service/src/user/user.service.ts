@@ -33,7 +33,7 @@ export class UserService {
       status: UserStatus.PENDING,
     };
     const newUserEntity = await this.userRepository.create(repoDto);
-
+    // TODO: add email or smthing
     console.log(`Temp password for ${payload.email}: ${tempPassword}`);
 
     return this.mapToDto(newUserEntity);

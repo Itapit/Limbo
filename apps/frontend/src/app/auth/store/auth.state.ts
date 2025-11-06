@@ -1,20 +1,18 @@
-import { Role } from '@limbo/common';
+import { UserDto } from '@limbo/common';
+import { AuthStatus } from '../dtos/auth-status.enum';
 
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
-  username: string | null;
-  email: string | null;
-  role: Role | null;
+  user: UserDto | null;
+  status: AuthStatus;
   loading: boolean;
-  error: string | null; // last known error (if any)
+  error: string | null;
 }
 
 export const initialAuthState: AuthState = {
-  // set initial required properties
-  username: null,
-  email: null,
-  role: null,
+  user: null,
+  status: AuthStatus.UNKNOWN,
   loading: false,
   error: null,
 };
