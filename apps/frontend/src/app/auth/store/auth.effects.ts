@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType, ROOT_EFFECTS_INIT } from '@ngrx/effects';
-import { catchError, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
+import { catchError, EMPTY, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
 
 import { Router } from '@angular/router';
 import { isPendingLoginResponse } from '@limbo/common';
@@ -111,7 +111,7 @@ export class AuthEffects {
       switchMap(([, user]) => {
         // If user is already in state (interceptor refresh), do nothing.
         if (user) {
-          return of();
+          return EMPTY;
         }
         // If user is null (F5 refresh), dispatch Load Me.
         return of(AuthActions.loadMeStart());
@@ -146,7 +146,6 @@ export class AuthEffects {
     )
   );
 
-  // This effect groups all "session end" events
   sessionEnd$ = createEffect(
     () =>
       this.actions$.pipe(

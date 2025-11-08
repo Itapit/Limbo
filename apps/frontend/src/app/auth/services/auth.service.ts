@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpBackend, HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   AuthRefreshResponse,
@@ -16,8 +16,10 @@ import { environment } from '../../environments/environment';
 })
 export class AuthService {
   private readonly baseUrl = `${environment.BACKEND_BASE_URL}`;
-
   private http = inject(HttpClient);
+
+  private httpBackend = inject(HttpBackend);
+  private cleanHttp = new HttpClient(this.httpBackend);
 
   login(dto: LoginRequest): Observable<LoginResponse | PendingLoginResponse> {
     return this.http.post<LoginResponse | PendingLoginResponse>(`${this.baseUrl}/auth/login`, dto);
@@ -32,11 +34,15 @@ export class AuthService {
     return this.http.get<UserDto>(`${this.baseUrl}/users/me`);
   }
 
+  /**
+   * This call MUST use the 'cleanHttp' client to avoid
+   * being re-intercepted by our own AuthInterceptor.
+   */
   refresh(): Observable<AuthRefreshResponse> {
-    return this.http.post<AuthRefreshResponse>(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true });
+    return this.cleanHttp.post<AuthRefreshResponse>(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true });
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/auth/logout`, {}, { withCredentials: true });
+    return this.http.post<void>(`${this.baseUrl}/auth/logout`, {});
   }
 }

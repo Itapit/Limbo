@@ -73,6 +73,13 @@ export class AuthFacade {
   }
 
   /**
+   * Dispatches the refresh action (called by the interceptor).
+   */
+  refresh() {
+    this.store.dispatch(AuthActions.refreshStart());
+  }
+
+  /**
    * Dispatches the logout action.
    */
   logout() {
