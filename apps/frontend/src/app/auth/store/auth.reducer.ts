@@ -1,7 +1,7 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 
 import { isPendingLoginResponse, LoginResponse } from '@limbo/common';
-import { AuthStatus } from '../dtos/auth-status.enum';
+import { SessionStatus } from '../dtos/session-status.enum';
 import { AuthActions } from './auth.actions';
 import { AUTH_FEATURE_KEY, initialAuthState } from './auth.state';
 
@@ -48,7 +48,7 @@ export const authReducer = createReducer(
         ...state,
         loading: false,
         user: null,
-        status: AuthStatus.PENDING,
+        sessionStatus: SessionStatus.PENDING,
       };
     }
 
@@ -59,7 +59,7 @@ export const authReducer = createReducer(
       loading: false,
       error: null,
       user: loginResponse.user,
-      status: AuthStatus.ACTIVE,
+      sessionStatus: SessionStatus.ACTIVE,
     };
   }),
 
@@ -71,7 +71,7 @@ export const authReducer = createReducer(
     loading: false,
     error: null,
     user: user,
-    status: user.status as unknown as AuthStatus,
+    sessionStatus: user.status as unknown as SessionStatus,
   })),
 
   /**
@@ -89,7 +89,7 @@ export const authReducer = createReducer(
    */
   on(AuthActions.logoutSuccess, () => ({
     ...initialAuthState,
-    status: AuthStatus.LOGGED_OUT,
+    sessionStatus: SessionStatus.LOGGED_OUT,
   })),
 
   /**

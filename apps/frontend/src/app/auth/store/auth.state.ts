@@ -1,18 +1,18 @@
 import { UserDto } from '@limbo/common';
-import { AuthStatus } from '../dtos/auth-status.enum';
+import { SessionStatus } from '../dtos/session-status.enum';
 
 export const AUTH_FEATURE_KEY = 'auth';
 
 export interface AuthState {
   user: UserDto | null;
-  status: AuthStatus;
+  sessionStatus: SessionStatus;
   loading: boolean;
   error: string | null;
 }
 
 export const initialAuthState: AuthState = {
   user: null,
-  status: AuthStatus.UNKNOWN,
+  sessionStatus: SessionStatus.UNKNOWN,
   loading: false,
   error: null,
 };

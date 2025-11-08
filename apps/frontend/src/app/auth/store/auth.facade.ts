@@ -5,12 +5,12 @@ import { AuthActions } from './auth.actions';
 import {
   selectAuthError,
   selectAuthLoading,
-  selectAuthStatus,
   selectEmail,
   selectIsLoggedIn,
   selectIsLoggedOut,
   selectIsPending,
   selectRole,
+  selectSessionStatus,
   selectUser,
   selectUsername,
 } from './auth.selectors';
@@ -32,7 +32,7 @@ export class AuthFacade {
   user$ = this.store.select(selectUser);
 
   /** Emits the raw AuthStatus enum (e.g., ACTIVE, PENDING) */
-  status$ = this.store.select(selectAuthStatus);
+  status$ = this.store.select(selectSessionStatus);
 
   // --- Derived Observables ---
 

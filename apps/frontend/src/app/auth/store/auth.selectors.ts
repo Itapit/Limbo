@@ -1,13 +1,12 @@
 import { createSelector } from '@ngrx/store';
-import { AuthStatus } from '../dtos/auth-status.enum';
+import { SessionStatus } from '../dtos/session-status.enum';
 import { authFeature } from './auth.reducer';
 
 export const {
-  selectAuthState,
   selectLoading: selectAuthLoading,
   selectError: selectAuthError,
   selectUser,
-  selectStatus: selectAuthStatus,
+  selectSessionStatus: selectSessionStatus,
 } = authFeature;
 
 /**
@@ -15,24 +14,24 @@ export const {
  */
 export const selectIsLoggedIn = createSelector(
   selectUser,
-  selectAuthStatus,
-  (user, status) => user !== null && status === AuthStatus.ACTIVE
+  selectSessionStatus,
+  (user, status) => user !== null && status === SessionStatus.ACTIVE
 );
 
 /**
  * Selects if the user is definitively logged out.
  */
-export const selectIsLoggedOut = createSelector(selectAuthStatus, (status) => status === AuthStatus.LOGGED_OUT);
+export const selectIsLoggedOut = createSelector(selectSessionStatus, (status) => status === SessionStatus.LOGGED_OUT);
 
 /**
  * Selects if we are currently in the PENDING state.
  */
-export const selectIsPending = createSelector(selectAuthStatus, (status) => status === AuthStatus.PENDING);
+export const selectIsPending = createSelector(selectSessionStatus, (status) => status === SessionStatus.PENDING);
 
 /**
  * Selects if we are still booting up (haven't checked token yet).
  */
-export const selectIsUnknown = createSelector(selectAuthStatus, (status) => status === AuthStatus.UNKNOWN);
+export const selectIsUnknown = createSelector(selectSessionStatus, (status) => status === SessionStatus.UNKNOWN);
 
 /**
  * Selects the user's role.
