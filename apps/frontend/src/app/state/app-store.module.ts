@@ -6,7 +6,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AuthEffects } from '../auth/store/auth.effects';
 import { authFeature } from '../auth/store/auth.reducer';
-import { coreFeature } from '../core/core.reducer';
+import { coreFeature } from '../core/store/core.reducer';
 import { environment } from '../environments/environment';
 import { AppInitEffects } from './app-init.effects';
 
