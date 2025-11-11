@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './auth/infrastructure/guards/admin.guard';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const appRoutes: Routes = [
@@ -10,7 +11,7 @@ export const appRoutes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
-    // canMatch: [AdminGuard],
+    canMatch: [adminGuard],
   },
   {
     path: 'dashboard',

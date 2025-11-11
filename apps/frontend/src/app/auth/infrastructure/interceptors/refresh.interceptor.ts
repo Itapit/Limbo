@@ -3,9 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
-import { AccessTokenService } from '../services/accessToken.service';
-import { AuthActions } from '../store/auth.actions';
-import { AuthState } from '../store/auth.state';
+import { AccessTokenService } from '../../services/accessToken.service';
+import { AuthActions } from '../../store/auth.actions';
+import { AuthState } from '../../store/auth.state';
 import { isAuthFinalFailureEndpoint, isAuthLoginEndpoint } from './interceptor.constants';
 
 @Injectable()
