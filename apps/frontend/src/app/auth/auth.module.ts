@@ -8,11 +8,10 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { MessageModule } from 'primeng/message';
 import { AuthRoutingModule } from './auth-routing.module';
 import { LoginComponent } from './login/login.component';
-import { RegisterComponent } from './register/register.component';
 import { AuthFacade } from './store/auth.facade';
 
 @NgModule({
-  declarations: [RegisterComponent, LoginComponent],
+  declarations: [LoginComponent],
   imports: [
     CommonModule,
     AuthRoutingModule,
