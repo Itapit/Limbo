@@ -8,6 +8,7 @@ import {
   selectAuthLoading,
   selectCompleteSetupError,
   selectEmail,
+  selectIsAppLoading,
   selectIsLoggedIn,
   selectIsLoggedOut,
   selectIsPending,
@@ -29,6 +30,9 @@ export class AuthFacade {
 
   /** Emits true if any auth API call is in progress */
   loading$ = this.store.select(selectAuthLoading);
+
+  /** Emits true if the app is in the initial loading state */
+  isAppLoading$ = this.store.select(selectIsAppLoading);
 
   /** Emits the last known auth error */
   error$ = this.store.select(selectAuthError);

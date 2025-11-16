@@ -19,6 +19,8 @@ export const selectIsLoggedIn = createSelector(
   (user, status) => user !== null && status === SessionStatus.ACTIVE
 );
 
+export const selectIsAppLoading = createSelector(selectSessionStatus, (status) => status === SessionStatus.UNKNOWN);
+
 /**
  * Selects if the user is definitively logged out.
  */

@@ -1,18 +1,23 @@
 import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
 import { UserRole } from '@limbo/common';
-import { combineLatest, map, take } from 'rxjs';
+import { filter, map, switchMap, take } from 'rxjs';
+import { SessionStatus } from '../../dtos/session-status.enum';
 import { AuthFacade } from '../../store/auth.facade';
 
 export const adminGuard: CanMatchFn = () => {
   const authFacade = inject(AuthFacade);
   const router = inject(Router);
 
-  return combineLatest([authFacade.isLoggedIn$, authFacade.role$]).pipe(
+  return authFacade.status$.pipe(
+    filter((status) => status !== SessionStatus.UNKNOWN),
     take(1),
-    map(([isLoggedIn, role]) => {
-      if (isLoggedIn && role === UserRole.ADMIN) {
-        return true; // User is logged in AND is an admin
+
+    switchMap(() => authFacade.role$),
+    take(1),
+    map((role) => {
+      if (role === UserRole.ADMIN) {
+        return true;
       }
 
       return router.createUrlTree(['/']);
