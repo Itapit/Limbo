@@ -7,7 +7,7 @@ import { isPendingLoginResponse } from '@limbo/common';
 import { Store } from '@ngrx/store';
 import { ErrorHandlerService } from '../../core/error-handler.service';
 import { AuthErrorSource } from '../dtos/auth-error-source.enum';
-import { AccessTokenService } from '../services/accessToken.service';
+import { AccessTokenService } from '../services/access-token.service';
 import { AuthService } from '../services/auth.service';
 import { AuthActions } from './auth.actions';
 import { selectUser } from './auth.selectors';

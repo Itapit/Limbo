@@ -22,8 +22,8 @@ import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { HASH_ROUNDS } from '../constants';
-import { UserRepository } from '../user/repository/user.repository';
-import { UserSchema } from '../user/repository/user.schema';
+import { UserRepository } from '../users/repository/user.repository';
+import { UserSchema } from '../users/repository/user.schema';
 import { RefreshTokenRepository } from './repository/refresh-token.repository';
 import ms = require('ms');
 

@@ -2,7 +2,7 @@ import { UserDto } from '@limbo/common';
 import { AdminCreateUserPayload, GetUserByIdPayload, USER_PATTERNS } from '@limbo/users-contracts';
 import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserService } from './user.service';
+import { UserService } from './users.service';
 
 @Controller('user')
 export class UserController {

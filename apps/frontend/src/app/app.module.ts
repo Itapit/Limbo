@@ -10,7 +10,7 @@ import { providePrimeNG } from 'primeng/config';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AppComponent } from './app.component';
 import { appRoutes } from './app.routes';
-import { CredentialsInterceptor } from './auth/infrastructure/interceptors/credentials.interceptors';
+import { CredentialsInterceptor } from './auth/infrastructure/interceptors/credentials.interceptor';
 import { AuthInterceptor } from './auth/infrastructure/interceptors/refresh.interceptor';
 import { AppStoreModule } from './state/app-store.module';
 
