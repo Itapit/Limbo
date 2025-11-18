@@ -1,0 +1,19 @@
+{
+  "name": "users-contracts",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/backend/users-contracts/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/backend/users-contracts",
+        "main": "libs/backend/users-contracts/src/index.ts",
+        "tsConfig": "libs/backend/users-contracts/tsconfig.lib.json",
+        "assets": ["libs/backend/users-contracts/*.md"]
+      }
+    }
+  }
+}

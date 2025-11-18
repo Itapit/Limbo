@@ -1,1 +1,20 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="isAppLoading$ | async; else appContent">
+  <div class="flex align-items-center justify-content-center fixed top-0 left-0 w-full h-full z-5">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</ng-container>
+
+<ng-template #appContent>
+  <ng-container *ngIf="globalError$ | async as error; else router">
+    <div class="flex align-items-center justify-content-center fixed top-0 left-0 w-full h-full z-5">
+      <p-card header="Error">
+        <p class="mt-4 mb-4">{{ error }}</p>
+        <p-button label="Try Again" icon="pi pi-refresh" (click)="reloadApp()" styleClass="w-full"></p-button>
+      </p-card>
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #router>
+  <router-outlet></router-outlet>
+</ng-template>
