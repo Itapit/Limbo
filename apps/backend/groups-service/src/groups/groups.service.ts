@@ -1,3 +1,4 @@
+import { GroupDto } from '@limbo/common';
 import {
   AddMemberPayload,
   CheckGroupMembershipPayload,
@@ -19,7 +20,7 @@ export class GroupsService {
   /**
    * Create a new group.
    */
-  async create(payload: CreateGroupPayload): Promise<GroupSchema> {
+  async create(payload: CreateGroupPayload): Promise<GroupDto> {
     const ownerObjectId = new Types.ObjectId(payload.ownerId);
 
     const repoParams: CreateGroupRepoDto = {
@@ -29,13 +30,14 @@ export class GroupsService {
       members: [ownerObjectId], // Owner is automatically a member
     };
 
-    return this.groupRepository.create(repoParams);
+    const group = await this.groupRepository.create(repoParams);
+    return this.mapToDto(group);
   }
 
   /**
    * Find a specific group.
    */
-  async findOne(id: string): Promise<GroupSchema> {
+  async findOne(id: string): Promise<GroupDto> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid Group ID');
     }
@@ -44,20 +46,21 @@ export class GroupsService {
     if (!group) {
       throw new NotFoundException('Group not found');
     }
-    return group;
+    return this.mapToDto(group);
   }
 
   /**
    * Find all groups a user belongs to.
    */
-  async findMyGroups(userId: string): Promise<GroupSchema[]> {
-    return this.groupRepository.findByMemberId(userId);
+  async findMyGroups(userId: string): Promise<GroupDto[]> {
+    const groups = await this.groupRepository.findByMemberId(userId);
+    return groups.map((group) => this.mapToDto(group));
   }
 
   /**
    * Add a member to a group.
    */
-  async addMember(payload: AddMemberPayload): Promise<GroupSchema> {
+  async addMember(payload: AddMemberPayload): Promise<GroupDto> {
     const group = await this.findOne(payload.groupId);
 
     if (group.ownerId.toString() !== payload.actorId) {
@@ -69,13 +72,13 @@ export class GroupsService {
       throw new NotFoundException('Group not found during member addition');
     }
 
-    return updatedGroup;
+    return this.mapToDto(updatedGroup);
   }
 
   /**
    * Remove a member from a group.
    */
-  async removeMember(payload: RemoveMemberPayload): Promise<GroupSchema> {
+  async removeMember(payload: RemoveMemberPayload): Promise<GroupDto> {
     const group = await this.findOne(payload.groupId);
 
     const isOwner = group.ownerId.toString() === payload.actorId;
@@ -93,13 +96,13 @@ export class GroupsService {
     if (!updatedGroup) {
       throw new NotFoundException('Group not found during member removal');
     }
-    return updatedGroup;
+    return this.mapToDto(updatedGroup);
   }
 
   /**
    * Update group details.
    */
-  async update(payload: UpdateGroupPayload): Promise<GroupSchema> {
+  async update(payload: UpdateGroupPayload): Promise<GroupDto> {
     const group = await this.findOne(payload.groupId);
 
     // Permission Check: Is the actor the owner?
@@ -116,7 +119,7 @@ export class GroupsService {
     if (!updated) {
       throw new NotFoundException('Group not found during update');
     }
-    return updated;
+    return this.mapToDto(updated);
   }
 
   /**
@@ -140,5 +143,21 @@ export class GroupsService {
       return false;
     }
     return this.groupRepository.isUserInGroup(payload.groupId, payload.userId);
+  }
+
+  /**
+   * Maps the Mongoose Document to the clean Shared DTO.
+   * Converts ObjectIds to Strings.
+   */
+  private mapToDto(group: GroupSchema): GroupDto {
+    return {
+      id: group._id.toString(),
+      name: group.name,
+      description: group.description,
+      ownerId: group.ownerId.toString(),
+      members: group.members.map((memberId) => memberId.toString()),
+      createdAt: group.createdAt,
+      updatedAt: group.updatedAt,
+    };
   }
 }

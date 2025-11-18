@@ -16,6 +16,10 @@ export class GroupSchema extends Document {
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId }], default: [], index: true })
   members: MongooseSchema.Types.ObjectId[];
+
+  // TypeScript definitions for Mongoose timestamps
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const GroupSchemaFactory = SchemaFactory.createForClass(GroupSchema);
