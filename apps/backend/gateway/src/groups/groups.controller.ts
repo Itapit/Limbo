@@ -4,6 +4,7 @@ import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Req, UseGuar
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AccessAuthenticatedRequest } from '../auth/types/access-jwt.types';
 import { AddMemberDto, CreateGroupDto, UpdateGroupDto } from './dtos';
 
 @Controller('groups')
@@ -12,7 +13,7 @@ export class GroupsController {
   constructor(@Inject(GROUP_SERVICE) private readonly groupsClient: ClientProxy) {}
 
   @Post()
-  async create(@Body() dto: CreateGroupDto, @Req() req): Promise<GroupDto> {
+  async create(@Body() dto: CreateGroupDto, @Req() req: AccessAuthenticatedRequest): Promise<GroupDto> {
     const payload = {
       ...dto,
       ownerId: req.user.userId,
@@ -22,7 +23,7 @@ export class GroupsController {
   }
 
   @Get('my-groups')
-  async findMyGroups(@Req() req): Promise<GroupDto[]> {
+  async findMyGroups(@Req() req: AccessAuthenticatedRequest): Promise<GroupDto[]> {
     return firstValueFrom(this.groupsClient.send<GroupDto[]>(GROUPS_PATTERNS.FIND_MY_GROUPS, req.user.userId));
   }
 
@@ -32,7 +33,11 @@ export class GroupsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') groupId: string, @Body() dto: UpdateGroupDto, @Req() req): Promise<GroupDto> {
+  async update(
+    @Param('id') groupId: string,
+    @Body() dto: UpdateGroupDto,
+    @Req() req: AccessAuthenticatedRequest
+  ): Promise<GroupDto> {
     const payload = {
       groupId,
       actorId: req.user.userId,
@@ -43,7 +48,11 @@ export class GroupsController {
   }
 
   @Post(':id/members')
-  async addMember(@Param('id') groupId: string, @Body() addMemberDto: AddMemberDto, @Req() req): Promise<GroupDto> {
+  async addMember(
+    @Param('id') groupId: string,
+    @Body() addMemberDto: AddMemberDto,
+    @Req() req: AccessAuthenticatedRequest
+  ): Promise<GroupDto> {
     const payload = {
       groupId,
       actorId: req.user.userId,
@@ -57,7 +66,7 @@ export class GroupsController {
   async removeMember(
     @Param('id') groupId: string,
     @Param('userId') targetUserId: string,
-    @Req() req
+    @Req() req: AccessAuthenticatedRequest
   ): Promise<GroupDto> {
     const payload = {
       groupId,
@@ -69,7 +78,7 @@ export class GroupsController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') groupId: string, @Req() req): Promise<boolean> {
+  async delete(@Param('id') groupId: string, @Req() req: AccessAuthenticatedRequest): Promise<boolean> {
     const payload = {
       groupId,
       actorId: req.user.userId,
