@@ -20,6 +20,9 @@ import { CompleteSetupDto, LoginDto } from './dtos';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PendingJwtGuard } from './guards/pending-jwt.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { AccessAuthenticatedRequest } from './types/access-jwt.types';
+import { PendingAuthenticatedRequest } from './types/pending-jwt.types';
+import { RefreshAuthenticatedRequest } from './types/refresh-jwt.types';
 import ms = require('ms');
 
 @Controller('auth')
@@ -60,12 +63,12 @@ export class AuthController {
   @UseGuards(PendingJwtGuard)
   @UsePipes(new ValidationPipe())
   async completeSetup(
-    @Req() req,
+    @Req() req: PendingAuthenticatedRequest,
     @Body() dto: CompleteSetupDto,
     @Res({ passthrough: true }) res: Response,
     @Headers('user-agent') userAgent: string
   ): Promise<LoginResponse> {
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const result = (await this.authService.completeSetup(userId, dto, userAgent)) as AuthLoginResponseDto;
 
@@ -88,12 +91,12 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   async refresh(
-    @Req() req,
+    @Req() req: RefreshAuthenticatedRequest,
     @Res({ passthrough: true }) res: Response,
     @Headers('user-agent') userAgent: string
   ): Promise<AuthRefreshResponse> {
-    const { id, jti } = req.user;
-    const result = await this.authService.refresh(id, jti, userAgent);
+    const { userId, jti } = req.user;
+    const result = await this.authService.refresh(userId, jti, userAgent);
 
     const maxAgeString = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN');
     const maxAgeMs = ms(maxAgeString as any) as unknown as number;
@@ -112,7 +115,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(RefreshTokenGuard)
-  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: RefreshAuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
     const { jti } = req.user;
 
     await this.authService.logout(jti);
@@ -128,10 +131,8 @@ export class AuthController {
 
   @Post('logout-all')
   @UseGuards(JwtAuthGuard)
-  async logoutAll(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const { id: userId } = req.user;
-
-    await this.authService.logoutAll(userId);
+  async logoutAll(@Req() req: AccessAuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logoutAll(req.user.userId);
 
     res.clearCookie('refresh-token', {
       httpOnly: true,
