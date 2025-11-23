@@ -107,7 +107,7 @@ export class GroupsEffects {
       ofType(GroupsActions.addMember),
       concatMap(({ groupId, request }) =>
         this.groupsService.addUserToGroup(groupId, request.targetUserId).pipe(
-          map(() => GroupsActions.addMemberSuccess({ groupId, result: true })),
+          map((group) => GroupsActions.addMemberSuccess({ group })),
           catchError((error) =>
             of(
               GroupsActions.addMemberFailure({

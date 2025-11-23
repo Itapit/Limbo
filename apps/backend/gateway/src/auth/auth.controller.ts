@@ -1,18 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthRefreshResponse, LoginResponse, PendingLoginResponse } from '@limbo/common';
 import { AuthLoginResponseDto } from '@limbo/users-contracts';
-import {
-  Body,
-  Controller,
-  Headers,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Headers, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -30,7 +19,6 @@ export class AuthController {
   constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {}
 
   @Post('login')
-  @UsePipes(new ValidationPipe())
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -61,7 +49,6 @@ export class AuthController {
 
   @Post('complete-setup')
   @UseGuards(PendingJwtGuard)
-  @UsePipes(new ValidationPipe())
   async completeSetup(
     @Req() req: PendingAuthenticatedRequest,
     @Body() dto: CompleteSetupDto,

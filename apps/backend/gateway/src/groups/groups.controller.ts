@@ -3,6 +3,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } fro
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AccessAuthenticatedRequest } from '../auth/types/access-jwt.types';
 import { AddMemberDto, CreateGroupDto, UpdateGroupDto } from './dtos';
+import { GroupIdParamsDto } from './dtos/group-id.dto';
 import { GroupsService } from './groups.service';
 
 @Controller('groups')
@@ -20,36 +21,36 @@ export class GroupsController {
     return this.groupsService.findByUser(req.user.userId);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<GroupDto> {
-    return this.groupsService.findOne(id);
+  @Get(':groupId')
+  async findOne(@Param() params: GroupIdParamsDto): Promise<GroupDto> {
+    return this.groupsService.findOne(params.groupId);
   }
 
-  @Patch(':id')
+  @Patch(':groupId')
   async update(
-    @Param('id') groupId: string,
+    @Param() params: GroupIdParamsDto,
     @Body() dto: UpdateGroupDto,
     @Req() req: AccessAuthenticatedRequest
   ): Promise<GroupDto> {
-    return this.groupsService.update(groupId, req.user.userId, dto);
+    return this.groupsService.update(params.groupId, req.user.userId, dto);
   }
 
-  @Post(':id/members')
+  @Post(':groupId/members')
   async addMember(
-    @Param('id') groupId: string,
+    @Param() params: GroupIdParamsDto,
     @Body() dto: AddMemberDto,
     @Req() req: AccessAuthenticatedRequest
   ): Promise<GroupDto> {
-    return this.groupsService.addMember(groupId, req.user.userId, dto);
+    return this.groupsService.addMember(params.groupId, req.user.userId, dto);
   }
 
-  @Delete(':id/members/:userId')
+  @Delete(':groupId/members/:userId')
   async removeMember(
-    @Param('id') groupId: string,
+    @Param() groupParams: GroupIdParamsDto,
     @Param('userId') targetUserId: string,
     @Req() req: AccessAuthenticatedRequest
   ): Promise<GroupDto> {
-    return this.groupsService.removeMember(groupId, req.user.userId, targetUserId);
+    return this.groupsService.removeMember(groupParams.groupId, req.user.userId, targetUserId);
   }
 
   @Delete(':id')

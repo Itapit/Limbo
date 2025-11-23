@@ -8,12 +8,11 @@ import {
   RemoveMemberPayload,
   UpdateGroupPayload,
 } from '@limbo/groups-contracts';
-import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { GroupsService } from './groups.service';
 
 @Controller('groups')
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 

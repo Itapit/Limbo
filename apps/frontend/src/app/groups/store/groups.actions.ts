@@ -27,7 +27,7 @@ export const GroupsActions = createActionGroup({
 
     // --- MEMBERS ---
     'Add Member': props<{ groupId: string; request: AddMemberRequest }>(),
-    'Add Member Success': props<{ groupId: string; result: boolean }>(),
+    'Add Member Success': props<{ group: GroupDto }>(),
     'Add Member Failure': props<{ error: GroupsError }>(),
 
     'Remove Member': props<{ groupId: string; request: RemoveMemberRequest }>(),

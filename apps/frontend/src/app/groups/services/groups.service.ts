@@ -26,7 +26,7 @@ export class GroupsService {
   }
 
   addUserToGroup(groupId: string, userId: string): Observable<GroupDto> {
-    return this.http.post<GroupDto>(`${this.baseUrl}/groups/${groupId}/members`, { userId });
+    return this.http.post<GroupDto>(`${this.baseUrl}/groups/${groupId}/members`, { targetUserId: userId });
   }
 
   removeUserFromGroup(groupId: string, userId: string): Observable<GroupDto> {
