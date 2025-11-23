@@ -10,7 +10,7 @@ export interface GroupsState {
   error: GroupsError | null;
 }
 
-export const initialAuthState: GroupsState = {
+export const initialGroupsState: GroupsState = {
   groups: [],
   loaded: false,
   loading: false,

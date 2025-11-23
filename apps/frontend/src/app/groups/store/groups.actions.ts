@@ -1,4 +1,4 @@
-import { AddMemberRequest, CreateGroupRequest, GroupDto, UpdateGroupRequest } from '@limbo/common';
+import { AddMemberRequest, CreateGroupRequest, GroupDto, RemoveMemberRequest, UpdateGroupRequest } from '@limbo/common';
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
 import { GroupsError } from '../dto/groups-error';
 
@@ -30,7 +30,7 @@ export const GroupsActions = createActionGroup({
     'Add Member Success': props<{ groupId: string; result: boolean }>(),
     'Add Member Failure': props<{ error: GroupsError }>(),
 
-    'Remove Member': props<{ groupId: string; userId: string }>(),
+    'Remove Member': props<{ groupId: string; request: RemoveMemberRequest }>(),
     'Remove Member Success': props<{ group: GroupDto }>(),
     'Remove Member Failure': props<{ error: GroupsError }>(),
   },

@@ -15,7 +15,7 @@ export class GroupsController {
     return this.groupsService.create(dto, req.user.userId);
   }
 
-  @Get('my-groups')
+  @Get()
   async findMyGroups(@Req() req: AccessAuthenticatedRequest): Promise<GroupDto[]> {
     return this.groupsService.findByUser(req.user.userId);
   }
