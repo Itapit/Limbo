@@ -2,7 +2,7 @@ import { GroupDto } from '@limbo/common';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AccessAuthenticatedRequest } from '../auth/types/access-jwt.types';
-import { AddMemberDto, CreateGroupDto, UpdateGroupDto } from './dtos';
+import { AddMemberDto, CreateGroupDto, GroupMemberParamsDto, UpdateGroupDto } from './dtos';
 import { GroupIdParamsDto } from './dtos/group-id.dto';
 import { GroupsService } from './groups.service';
 
@@ -45,16 +45,12 @@ export class GroupsController {
   }
 
   @Delete(':groupId/members/:userId')
-  async removeMember(
-    @Param() groupParams: GroupIdParamsDto,
-    @Param('userId') targetUserId: string,
-    @Req() req: AccessAuthenticatedRequest
-  ): Promise<GroupDto> {
-    return this.groupsService.removeMember(groupParams.groupId, req.user.userId, targetUserId);
+  async removeMember(@Param() params: GroupMemberParamsDto, @Req() req: AccessAuthenticatedRequest): Promise<GroupDto> {
+    return this.groupsService.removeMember(params.groupId, req.user.userId, params.userId);
   }
 
-  @Delete(':id')
-  async delete(@Param('id') groupId: string, @Req() req: AccessAuthenticatedRequest): Promise<boolean> {
-    return this.groupsService.delete(groupId, req.user.userId);
+  @Delete(':groupId')
+  async delete(@Param() params: GroupIdParamsDto, @Req() req: AccessAuthenticatedRequest): Promise<boolean> {
+    return this.groupsService.delete(params.groupId, req.user.userId);
   }
 }

@@ -82,7 +82,7 @@ export const groupsReducer = createReducer(
   })),
   // Success actions for members just update the group in the list
 
-  on(GroupsActions.addMemberSuccess, (state, { group }) => ({
+  on(GroupsActions.addMemberSuccess, GroupsActions.removeMemberSuccess, (state, { group }) => ({
     ...state,
     groups: state.groups.map((g) => (g.id === group.id ? group : g)),
     loading: false,
