@@ -5,6 +5,8 @@ import { ErrorHandlerService } from '../../core/error-handler.service';
 import { GroupsService } from '../services/groups.service';
 import { GroupsActions } from './groups.actions';
 
+import { Action } from '@ngrx/store';
+import { GroupsError } from '../dto/groups-error';
 import { GroupsErrorSource } from '../dto/groups-error-source.enum';
 
 @Injectable()
@@ -12,6 +14,14 @@ export class GroupsEffects {
   private actions$ = inject(Actions);
   private groupsService = inject(GroupsService);
   private errorHandler = inject(ErrorHandlerService);
+
+  /**
+   * TRIGGER: Automatically dispatch this action when the effect is initialized.
+   * This ensures groups load as soon as this module is lazy-loaded after login.
+   */
+  ngrxOnInitEffects(): Action {
+    return GroupsActions.loadGroups();
+  }
 
   // --- LOAD ---
   loadGroups$ = createEffect(() =>
@@ -23,7 +33,7 @@ export class GroupsEffects {
           catchError((error) => {
             return of(
               GroupsActions.loadGroupsFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.LOAD },
+                error: this.createError(error, GroupsErrorSource.LOAD),
               })
             );
           })
@@ -44,7 +54,7 @@ export class GroupsEffects {
           catchError((error) =>
             of(
               GroupsActions.createGroupFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.CREATE },
+                error: this.createError(error, GroupsErrorSource.CREATE),
               })
             )
           )
@@ -63,7 +73,7 @@ export class GroupsEffects {
           catchError((error) =>
             of(
               GroupsActions.updateGroupFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.UPDATE },
+                error: this.createError(error, GroupsErrorSource.UPDATE),
               })
             )
           )
@@ -82,7 +92,7 @@ export class GroupsEffects {
           catchError((error) =>
             of(
               GroupsActions.deleteGroupFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.DELETE },
+                error: this.createError(error, GroupsErrorSource.DELETE),
               })
             )
           )
@@ -101,7 +111,7 @@ export class GroupsEffects {
           catchError((error) =>
             of(
               GroupsActions.addMemberFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.ADD_MEMBER },
+                error: this.createError(error, GroupsErrorSource.ADD_MEMBER),
               })
             )
           )
@@ -119,7 +129,7 @@ export class GroupsEffects {
           catchError((error) =>
             of(
               GroupsActions.removeMemberFailure({
-                error: { message: this.errorHandler.classifyError(error), source: GroupsErrorSource.REMOVE_MEMBER },
+                error: this.createError(error, GroupsErrorSource.REMOVE_MEMBER),
               })
             )
           )
@@ -127,4 +137,14 @@ export class GroupsEffects {
       )
     )
   );
+
+  /**
+   * Helper to construct the GroupsError object using the ErrorHandlerService.
+   */
+  private createError(error: unknown, source: GroupsErrorSource): GroupsError {
+    return {
+      message: this.errorHandler.classifyError(error),
+      source,
+    };
+  }
 }

@@ -18,7 +18,7 @@ export class GroupsService {
   }
 
   updateGroup(groupId: string, groupData: UpdateGroupRequest): Observable<GroupDto> {
-    return this.http.put<GroupDto>(`${this.baseUrl}/groups/${groupId}`, groupData);
+    return this.http.patch<GroupDto>(`${this.baseUrl}/groups/${groupId}`, groupData);
   }
 
   deleteGroup(groupId: string): Observable<boolean> {
