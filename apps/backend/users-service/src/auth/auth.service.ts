@@ -13,6 +13,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -89,7 +90,7 @@ export class AuthService {
     try {
       return this.grantUserTokens(user, payload.userAgent);
     } catch (e) {
-      console.error('Error during token granting:', e);
+      Logger.error('Error during token granting:', e);
       throw new RpcException(new InternalServerErrorException('Could not grant tokens').getResponse());
     }
   }
@@ -102,7 +103,7 @@ export class AuthService {
       await this.refreshTokenRepo.delete(payload.jti);
       return { success: true };
     } catch (e) {
-      console.error('Error during logout:', e);
+      Logger.error('Error during logout:', e);
       return { success: true };
     }
   }
@@ -115,7 +116,7 @@ export class AuthService {
       await this.refreshTokenRepo.deleteAllForUser(payload.userId);
       return { success: true };
     } catch (e) {
-      console.error('Error during logout-all:', e);
+      Logger.error('Error during logout-all:', e);
       return { success: true };
     }
   }
@@ -204,7 +205,7 @@ export class AuthService {
         user: this.mapToDto(user),
       };
     } catch (e) {
-      console.error('Failed to grant user tokens:', e);
+      Logger.error('Failed to grant user tokens:', e);
       const error = new InternalServerErrorException('Could not grant tokens');
       throw new RpcException(error.getResponse());
     }

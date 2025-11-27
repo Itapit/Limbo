@@ -58,7 +58,8 @@
     },
     "@nx/angular:service": {
       "type": "service",
-      "skipTests": true
+      "skipTests": true,
+      "unitTestRunner": "none"
     },
     "@nx/angular:class": {
       "skipTests": true

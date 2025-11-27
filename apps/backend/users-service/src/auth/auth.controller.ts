@@ -6,7 +6,7 @@ import {
   CompleteSetupPayload,
   USER_PATTERNS,
 } from '@limbo/users-contracts';
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 
@@ -16,7 +16,7 @@ export class AuthController {
 
   @MessagePattern(USER_PATTERNS.PING)
   handlePing(data: string): string {
-    console.log(`Received PING from Gateway: ${data}`);
+    Logger.log(`Received PING from Gateway: ${data}`);
     return 'PONG from Users Service!';
   }
 

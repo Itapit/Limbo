@@ -3,6 +3,7 @@
  * This is only a minimal backend to get started.
  */
 import { GROUPS_CONFIG } from '@limbo/groups-contracts';
+import { Logger } from '@nestjs/common';
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -26,7 +27,7 @@ async function bootstrap() {
   );
 
   await app.listen();
-  console.log(`🚀 Application is running on: http://localhost:${GROUPS_CONFIG.PORT}`);
+  Logger.log(`🚀 Application is running on: http://localhost:${GROUPS_CONFIG.PORT}`);
 }
 
 bootstrap();
