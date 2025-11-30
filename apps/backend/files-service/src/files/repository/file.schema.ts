@@ -17,8 +17,8 @@ export class FileSchema {
   @Prop()
   mimeType?: string;
 
-  @Prop({ required: true })
-  ownerId: string;
+  @Prop()
+  size?: number;
 
   @Prop({
     required: true,
@@ -28,9 +28,8 @@ export class FileSchema {
   })
   status: FileStatus;
 
-  @Prop()
-  size?: number;
-
+  @Prop({ required: true })
+  ownerId: string;
   // --- Folder & Sharing Logic ---
 
   @Prop({ default: false })
@@ -41,22 +40,24 @@ export class FileSchema {
     type: MongooseSchema.Types.ObjectId,
     ref: 'FileSchema',
     default: null,
+    index: true,
   })
   parentId?: string;
 
   // List of User IDs who can access this file
-  @Prop({ type: [String], default: [] })
+  @Prop({ type: [String], default: [], index: true })
   sharedWithUsers: string[];
 
   // List of Group IDs who can access this file
-  @Prop({ type: [String], default: [] })
+  @Prop({ type: [String], default: [], index: true })
   sharedWithGroups: string[];
+
+  // TypeScript definitions for Mongoose timestamps
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const FileSchemaFactory = SchemaFactory.createForClass(FileSchema);
 
 //  "Get all files in this folder for this user"
 FileSchemaFactory.index({ ownerId: 1, parentId: 1 });
-// "Get files shared with me"
-FileSchemaFactory.index({ sharedWithUsers: 1 });
-FileSchemaFactory.index({ sharedWithGroups: 1 });
