@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { StorageModule } from '../storage/storage.module';
 import { FilesController } from './files.controller';
 import { FilesService } from './files.service';
 import { FileRepository } from './repository/file.repository';
@@ -7,7 +8,7 @@ import { FileSchema, FileSchemaFactory } from './repository/file.schema';
 import { MongoFileRepository } from './repository/mongo-file.repository';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: FileSchema.name, schema: FileSchemaFactory }])],
+  imports: [MongooseModule.forFeature([{ name: FileSchema.name, schema: FileSchemaFactory }]), StorageModule],
   controllers: [FilesController],
   providers: [
     FilesService,

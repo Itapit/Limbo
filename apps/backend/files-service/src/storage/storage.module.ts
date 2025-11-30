@@ -32,5 +32,6 @@ import { StorageService } from './storage.service';
       useClass: MinioStorageService,
     },
   ],
+  exports: [StorageService],
 })
 export class StorageModule {}
