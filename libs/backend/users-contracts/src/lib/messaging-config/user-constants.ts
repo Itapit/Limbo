@@ -8,7 +8,6 @@ export const USER_CONFIG = {
 export const USER_PATTERNS = {
   CREATE_USER: 'user:create_user',
   GET_USER_BY_ID: 'user:get_user_by_id',
-  PING: 'user:ping',
   AUTH_LOGIN: 'user:auth_login',
   AUTH_COMPLETE_SETUP: 'user:auth_complete_setup',
   AUTH_REFRESH: 'user:auth_refresh',

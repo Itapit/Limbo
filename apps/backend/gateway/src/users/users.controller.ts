@@ -10,11 +10,6 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('ping')
-  async checkComms(): Promise<string> {
-    return this.usersService.ping();
-  }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getMe(@Req() req: AccessAuthenticatedRequest): Promise<UserDto> {

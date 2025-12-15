@@ -4,3 +4,7 @@ maybe use the following things??:
     Doppler
     Imgbot
     codeScene
+
+
+actuator?
+eureka equivalent?
