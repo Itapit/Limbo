@@ -1,5 +1,10 @@
 import { FileStatus } from '@LucidRF/common';
-import { ConfirmUploadPayload, DeleteResourcePayload, InitializeUploadPayload } from '@LucidRF/files-contracts';
+import {
+  ConfirmUploadPayload,
+  DeleteResourcePayload,
+  GetDownloadUrlPayload,
+  InitializeUploadPayload,
+} from '@LucidRF/files-contracts';
 import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
@@ -70,16 +75,16 @@ export class FileService {
   }
 
   async delete(payload: DeleteResourcePayload) {
-    await this.verifyOwner(payload.id, payload.userId);
-    await this.fileRepository.delete(payload.id);
+    await this.verifyOwner(payload.resourceId, payload.userId);
+    await this.fileRepository.delete(payload.resourceId);
 
-    this.logger.log(`Deleted file ${payload.id} (User: ${payload.userId})`);
+    this.logger.log(`Deleted file ${payload.resourceId} (User: ${payload.userId})`);
 
-    return { success: true, id: payload.id };
+    return { success: true, id: payload.resourceId };
   }
 
-  async getDownloadUrl(fileId: string, userId: string) {
-    const file = await this.verifyOwner(fileId, userId);
+  async getDownloadUrl(payload: GetDownloadUrlPayload) {
+    const file = await this.verifyOwner(payload.resourceId, payload.userId);
     return this.storageService.getPresignedGetUrl(file.storageKey);
   }
 

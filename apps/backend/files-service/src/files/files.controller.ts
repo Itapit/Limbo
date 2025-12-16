@@ -4,6 +4,7 @@ import {
   DeleteResourcePayload,
   FILES_PATTERNS,
   GetContentPayload,
+  GetDownloadUrlPayload,
   InitializeUploadPayload,
   ShareResourcePayload,
   UnshareResourcePayload,
@@ -33,8 +34,8 @@ export class FilesController {
   }
 
   @MessagePattern(FILES_PATTERNS.GET_DOWNLOAD_URL)
-  async getDownloadUrl(@Payload() payload: { resourceId: string; userId: string }) {
-    return this.filesService.file.getDownloadUrl(payload.resourceId, payload.userId);
+  async getDownloadUrl(@Payload() payload: GetDownloadUrlPayload) {
+    return this.filesService.file.getDownloadUrl(payload);
   }
 
   // --- Folder Management ---
