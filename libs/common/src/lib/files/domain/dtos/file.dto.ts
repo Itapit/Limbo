@@ -1,4 +1,4 @@
-import { FileStatus } from './file-status.enum';
+import { FileStatus } from '../enums/file-status.enum';
 
 export class FileDto {
   id!: string;
