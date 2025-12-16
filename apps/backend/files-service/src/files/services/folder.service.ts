@@ -42,10 +42,10 @@ export class FolderService {
   }
 
   async delete(payload: DeleteResourcePayload) {
-    const { userId, id } = payload;
-    await this.verifyOwner(id, userId);
-    await this.recursiveDelete(id, userId);
-    return { success: true, id };
+    const { userId, resourceId } = payload;
+    await this.verifyOwner(resourceId, userId);
+    await this.recursiveDelete(resourceId, userId);
+    return { success: true, resourceId };
   }
 
   // --- Helpers ---
