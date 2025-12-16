@@ -9,10 +9,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageService } from '../../storage/storage.service';
-import { CreateFileRepoDto } from '../domain/dtos/create-file-repo.dto';
+import { CreateFileRepoDto } from '../domain/dtos';
+import { FileEntity } from '../domain/entities';
 import { AccessLevel, ResourceType } from '../domain/enums';
-import { FileEntity } from '../domain/file.entity';
-import { FileRepository } from '../domain/file.repository';
+import { FileRepository } from '../domain/repositories';
 import { AclService } from './acl.service';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { FileStatus } from '@LucidRF/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { FileEntity } from '../../domain/file.entity';
+import { FileEntity } from '../../domain/entities';
 import { PermissionSchema, PermissionSchemaFactory } from './permission.schema';
 
 export type FileDocument = FileSchema & Document;

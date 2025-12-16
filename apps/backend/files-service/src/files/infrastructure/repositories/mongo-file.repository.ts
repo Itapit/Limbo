@@ -2,11 +2,10 @@ import { PermissionType } from '@LucidRF/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateFileRepoDto } from '../domain/dtos/create-file-repo.dto';
-import { FileEntity } from '../domain/file.entity';
-import { FileRepository } from '../domain/file.repository';
-import { Permission } from '../domain/permission.entity';
-import { FileSchema, toFileEntity } from './schemas/file.schema';
+import { CreateFileRepoDto } from '../../domain/dtos';
+import { FileEntity, PermissionEntity } from '../../domain/entities';
+import { FileRepository } from '../../domain/repositories';
+import { FileSchema, toFileEntity } from '../schemas';
 
 @Injectable()
 export class MongoFileRepository implements FileRepository {
@@ -67,7 +66,7 @@ export class MongoFileRepository implements FileRepository {
 
   // --- Permission Logic ---
 
-  async addPermission(id: string, permission: Permission): Promise<FileEntity> {
+  async addPermission(id: string, permission: PermissionEntity): Promise<FileEntity> {
     // Remove existing permission for this subject (if any) to avoid duplicates
     await this.fileModel
       .updateOne(

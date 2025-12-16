@@ -2,11 +2,10 @@ import { PermissionType } from '@LucidRF/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateFolderRepoDto } from '../domain/dtos/create-folder-repository.dto';
-import { FolderEntity } from '../domain/folder.entity';
-import { FolderRepository } from '../domain/folder.repository';
-import { Permission } from '../domain/permission.entity';
-import { FolderSchema, toFolderEntity } from './schemas/folder.schema';
+import { CreateFolderRepoDto } from '../../domain/dtos';
+import { FolderEntity, PermissionEntity } from '../../domain/entities';
+import { FolderRepository } from '../../domain/repositories';
+import { FolderSchema, toFolderEntity } from '../schemas';
 
 @Injectable()
 export class MongoFolderRepository implements FolderRepository {
@@ -51,7 +50,7 @@ export class MongoFolderRepository implements FolderRepository {
 
   // --- Permission Logic (Identical to File) ---
 
-  async addPermission(id: string, permission: Permission): Promise<FolderEntity> {
+  async addPermission(id: string, permission: PermissionEntity): Promise<FolderEntity> {
     await this.folderModel
       .updateOne(
         { _id: id },

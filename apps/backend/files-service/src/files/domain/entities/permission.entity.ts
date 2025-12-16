@@ -1,11 +1,11 @@
 import { PermissionRole, PermissionType } from '@LucidRF/common';
 
-export class Permission {
+export class PermissionEntity {
   subjectId: string;
   subjectType: PermissionType;
   role: PermissionRole;
 
-  constructor(partial: Partial<Permission>) {
+  constructor(partial: Partial<PermissionEntity>) {
     Object.assign(this, partial);
   }
 }

@@ -1,5 +1,5 @@
 import { FileStatus } from '@LucidRF/common';
-import { Permission } from '../permission.entity';
+import { Permission } from '../entities/permission.entity';
 
 export class CreateFileRepoDto {
   originalFileName: string;

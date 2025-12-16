@@ -1,7 +1,6 @@
 import { PermissionType } from '@LucidRF/common';
-import { CreateFolderRepoDto } from './dtos/create-folder-repository.dto';
-import { FolderEntity } from './folder.entity';
-import { Permission } from './permission.entity';
+import { CreateFolderRepoDto } from '../dtos/create-folder-repository.dto';
+import { FolderEntity, PermissionEntity } from '../entities';
 
 export abstract class FolderRepository {
   /**
@@ -39,7 +38,7 @@ export abstract class FolderRepository {
    * Adds a new permission or updates an existing one for a specific subject (User/Group).
    * This effectively shares the folder with that subject.
    */
-  abstract addPermission(id: string, permission: Permission): Promise<FolderEntity>;
+  abstract addPermission(id: string, permission: PermissionEntity): Promise<FolderEntity>;
 
   /**
    * Revokes access for a specific subject by removing their permission entry.

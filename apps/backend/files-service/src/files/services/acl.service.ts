@@ -1,12 +1,11 @@
 import { PermissionRole } from '@LucidRF/common';
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { FileEntity, FolderEntity, PermissionEntity } from '../domain/entities';
 import { AccessLevel, PermissionAction, ResourceType } from '../domain/enums';
-import { FileEntity } from '../domain/file.entity';
-import { FileRepository } from '../domain/file.repository';
-import { FolderEntity } from '../domain/folder.entity';
-import { FolderRepository } from '../domain/folder.repository';
-import { Permission } from '../domain/permission.entity';
+import { FileRepository, FolderRepository } from '../domain/repositories';
+
 //TODO add p-limit / bulk updates in the repo / Transaction support
+
 @Injectable()
 export class AclService {
   private readonly logger = new Logger(AclService.name);
@@ -60,7 +59,12 @@ export class AclService {
     return resource;
   }
 
-  async propagatePermissionChange(folderId: string, ownerId: string, permission: Permission, action: PermissionAction) {
+  async propagatePermissionChange(
+    folderId: string,
+    ownerId: string,
+    permission: PermissionEntity,
+    action: PermissionAction
+  ) {
     this.logger.log(`Starting propagation (${action}) for folder ${folderId}`);
 
     const [subFolders, files] = await Promise.all([
@@ -79,7 +83,11 @@ export class AclService {
   /**
    * Helper: Iterates over File Entities and applies updates via Repository.
    */
-  private async propagateToFiles(files: FileEntity[], permission: Permission, action: PermissionAction): Promise<void> {
+  private async propagateToFiles(
+    files: FileEntity[],
+    permission: PermissionEntity,
+    action: PermissionAction
+  ): Promise<void> {
     const operations = files.map((file) => {
       const fileId = file._id.toString();
 
@@ -101,7 +109,7 @@ export class AclService {
   private async propagateToFolders(
     folders: FolderEntity[],
     ownerId: string,
-    permission: Permission,
+    permission: PermissionEntity,
     action: PermissionAction
   ): Promise<void> {
     const operations = folders.map(async (folder) => {
@@ -121,7 +129,7 @@ export class AclService {
     await Promise.all(operations);
   }
 
-  private shouldUpgrade(currentPermissions: Permission[], newPermission: Permission): boolean {
+  private shouldUpgrade(currentPermissions: PermissionEntity[], newPermission: PermissionEntity): boolean {
     const existing = currentPermissions.find(
       (p) => p.subjectId === newPermission.subjectId && p.subjectType === newPermission.subjectType
     );

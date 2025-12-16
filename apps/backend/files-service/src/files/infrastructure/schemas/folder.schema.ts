@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { FolderEntity } from '../../domain/folder.entity';
+import { FolderEntity } from '../../domain/entities';
 import { PermissionSchema, PermissionSchemaFactory } from './permission.schema';
 
 export type FolderDocument = FolderSchema & Document;

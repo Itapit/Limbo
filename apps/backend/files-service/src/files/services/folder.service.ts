@@ -1,9 +1,8 @@
 import { CreateFolderPayload, DeleteResourcePayload, GetContentPayload } from '@LucidRF/files-contracts';
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateFolderRepoDto } from '../domain/dtos/create-folder-repository.dto';
+import { CreateFolderRepoDto } from '../domain/dtos';
 import { AccessLevel, ResourceType } from '../domain/enums';
-import { FileRepository } from '../domain/file.repository';
-import { FolderRepository } from '../domain/folder.repository';
+import { FileRepository, FolderRepository } from '../domain/repositories';
 import { AclService } from './acl.service';
 
 @Injectable()

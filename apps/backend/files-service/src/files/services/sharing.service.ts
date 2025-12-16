@@ -1,13 +1,12 @@
 import { PermissionRole } from '@LucidRF/common';
 import { ShareResourcePayload, UnshareResourcePayload } from '@LucidRF/files-contracts';
 import { Injectable } from '@nestjs/common';
-import { AccessLevel, PermissionAction, ResourceType } from './domain/enums';
-import { FileRepository } from './domain/file.repository';
-import { FolderRepository } from './domain/folder.repository';
-import { AclService } from './services';
+import { AccessLevel, PermissionAction, ResourceType } from '../domain/enums';
+import { FileRepository, FolderRepository } from '../domain/repositories';
+import { AclService } from './acl.service';
 
 @Injectable()
-export class FilesService {
+export class SharingService {
   constructor(
     private readonly aclService: AclService,
     private readonly fileRepo: FileRepository,

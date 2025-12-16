@@ -1,7 +1,6 @@
 import { PermissionType } from '@LucidRF/common';
-import { CreateFileRepoDto } from './dtos/create-file-repo.dto';
-import { FileEntity } from './file.entity';
-import { Permission } from './permission.entity';
+import { CreateFileRepoDto } from '../dtos/create-file-repo.dto';
+import { FileEntity, PermissionEntity } from '../entities';
 
 export abstract class FileRepository {
   /**
@@ -50,7 +49,7 @@ export abstract class FileRepository {
    * Adds a new permission or updates an existing one for a specific subject (User/Group).
    * This effectively shares the file with that subject.
    */
-  abstract addPermission(id: string, permission: Permission): Promise<FileEntity>;
+  abstract addPermission(id: string, permission: PermissionEntity): Promise<FileEntity>;
 
   /**
    * Revokes access for a specific subject by removing their permission entry.

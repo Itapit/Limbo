@@ -1,4 +1,4 @@
-import { Permission } from '../permission.entity';
+import { Permission } from '../entities/permission.entity';
 
 export class CreateFolderRepoDto {
   name: string;

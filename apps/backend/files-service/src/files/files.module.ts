@@ -2,17 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StorageModule } from '../storage/storage.module';
-import { FileRepository } from './domain/file.repository';
-import { FolderRepository } from './domain/folder.repository';
+import { FileRepository, FolderRepository } from './domain/repositories';
 import { FilesController } from './files.controller';
-import { FilesService } from './files.service';
-import { MongoFileRepository } from './infrastructure/mongo-file.repository';
-import { MongoFolderRepository } from './infrastructure/mongo-folder.repository';
-import { FileSchema, FileSchemaFactory } from './infrastructure/schemas/file.schema';
-import { FolderSchema, FolderSchemaFactory } from './infrastructure/schemas/folder.schema';
-import { AclService } from './services/acl.service';
-import { FileService } from './services/file.service';
-import { FolderService } from './services/folder.service';
+import { MongoFileRepository, MongoFolderRepository } from './infrastructure/repositories';
+import { FileSchema, FileSchemaFactory, FolderSchema, FolderSchemaFactory } from './infrastructure/schemas';
+import { AclService, FileService, FolderService, SharingService } from './services';
 
 @Module({
   imports: [
@@ -25,7 +19,7 @@ import { FolderService } from './services/folder.service';
   ],
   controllers: [FilesController],
   providers: [
-    FilesService,
+    SharingService,
     FileService,
     FolderService,
     AclService,
