@@ -1,6 +1,7 @@
 import { CreateFolderPayload, DeleteResourcePayload, GetContentPayload } from '@LucidRF/files-contracts';
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateFolderRepoDto } from '../domain/dtos';
+import { toFileDto, toFolderDto } from '../domain/entities';
 import { AccessLevel, ResourceType } from '../domain/enums';
 import { FileRepository, FolderRepository } from '../domain/repositories';
 import { AclService } from './acl.service';
@@ -50,7 +51,10 @@ export class FolderService {
       this.folderRepository.findSubFolders(targetId, userId),
     ]);
 
-    return { files, folders };
+    return {
+      files: files.map(toFileDto),
+      folders: folders.map(toFolderDto),
+    };
   }
 
   async delete(payload: DeleteResourcePayload) {

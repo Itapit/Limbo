@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageService } from '../../storage/storage.service';
 import { CreateFileRepoDto } from '../domain/dtos';
-import { FileEntity, FolderEntity, PermissionEntity } from '../domain/entities';
+import { FileEntity, FolderEntity, PermissionEntity, toFileDto } from '../domain/entities';
 import { AccessLevel, ResourceType } from '../domain/enums';
 import { FileRepository } from '../domain/repositories';
 import { AclService } from './acl.service';
@@ -40,7 +40,10 @@ export class FileService {
 
     this.logger.log(`Initialized upload for file ${file._id} (User: ${userId})`);
 
-    return { uploadUrl, file };
+    return {
+      uploadUrl,
+      file: toFileDto(file),
+    };
   }
 
   async confirmUpload(payload: ConfirmUploadPayload) {
@@ -51,7 +54,8 @@ export class FileService {
 
     if (success) {
       this.logger.log(`File ${fileId} confirmed successfully by user ${userId}`);
-      return this.fileRepository.updateStatus(fileId, FileStatus.UPLOADED);
+      const file = await this.fileRepository.updateStatus(fileId, FileStatus.UPLOADED);
+      return toFileDto(file);
     } else {
       this.logger.warn(`File ${fileId} upload failed or cancelled by user ${userId}. Deleting metadata.`);
       await this.fileRepository.delete(fileId);

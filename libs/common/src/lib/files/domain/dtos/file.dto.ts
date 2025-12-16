@@ -1,13 +1,15 @@
 import { FileStatus } from '../enums/file-status.enum';
+import { PermissionDto } from './permission.dto';
 
 export class FileDto {
-  id!: string;
+  resourceId!: string;
   originalFileName!: string;
-  mimeType!: string;
-  size!: number;
-  status!: FileStatus;
   ownerId!: string;
+  size!: number;
+  mimeType!: string;
+  status!: FileStatus;
   parentFolderId?: string | null;
+  permissions!: PermissionDto[];
   createdAt!: Date;
   updatedAt!: Date;
 }

@@ -1,7 +1,7 @@
 import { PermissionDto } from './permission.dto';
 
 export class FolderDto {
-  id!: string;
+  resourceId!: string;
   name!: string;
   ownerId!: string;
   parentFolderId?: string | null;
