@@ -17,4 +17,4 @@ import { FILES_CONFIG, FILES_SERVICE } from './files-constants';
   ],
   exports: [ClientsModule],
 })
-export class GroupClientModule {}
+export class FilesClientModule {}
