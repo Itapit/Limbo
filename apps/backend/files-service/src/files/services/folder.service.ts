@@ -57,25 +57,23 @@ export class FolderService {
   async delete(payload: DeleteResourcePayload) {
     const { userId, resourceId } = payload;
     await this.aclService.validateAccess(resourceId, userId, ResourceType.FOLDER, AccessLevel.OWNER);
-    await this.recursiveDelete(resourceId, userId);
+    await this.recursiveDelete(resourceId);
     return { success: true, resourceId };
   }
 
-  // --- Helpers ---
+  /**
+   * Recursive helper that uses SYSTEM methods to clean up
+   */
+  private async recursiveDelete(folderId: string) {
+    // Find Subfolders using SYSTEM access (ignores ownership/permissions)
+    const subFolders = await this.folderRepository.findSubFoldersByParentIdSystem(folderId);
 
-  private async recursiveDelete(folderId: string, userId: string) {
-    const subFolders = await this.folderRepository.findSubFolders(folderId, userId);
-    //TODO add recursive delete that will ignore ownerId so no orphan folders/files uploaded by other users remain
-    // Delete sub-folders first
+    // Recurse First (Depth-First Traversal)
     for (const sub of subFolders) {
-      if (sub._id) await this.recursiveDelete(sub._id, userId);
+      if (sub._id) await this.recursiveDelete(sub._id.toString());
     }
 
-    // Delete files in this folder
-    const files = await this.fileRepository.findByFolder(folderId, userId);
-    for (const file of files) {
-      if (file._id) await this.fileRepository.delete(file._id);
-    }
+    await this.fileRepository.deleteManyByFolderId(folderId);
 
     await this.folderRepository.delete(folderId);
   }

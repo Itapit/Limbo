@@ -1,6 +1,6 @@
 import { PermissionRole } from '@LucidRF/common';
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { AccessLevel, ResourceType } from '../domain/enums';
+import { AccessLevel, PermissionAction, ResourceType } from '../domain/enums';
 import { FileEntity } from '../domain/file.entity';
 import { FileRepository } from '../domain/file.repository';
 import { FolderEntity } from '../domain/folder.entity';
@@ -60,7 +60,7 @@ export class AclService {
     return resource;
   }
 
-  async propagatePermissionChange(folderId: string, ownerId: string, permission: Permission, action: 'ADD' | 'REMOVE') {
+  async propagatePermissionChange(folderId: string, ownerId: string, permission: Permission, action: PermissionAction) {
     this.logger.log(`Starting propagation (${action}) for folder ${folderId}`);
 
     const [subFolders, files] = await Promise.all([
@@ -79,11 +79,11 @@ export class AclService {
   /**
    * Helper: Iterates over File Entities and applies updates via Repository.
    */
-  private async propagateToFiles(files: FileEntity[], permission: Permission, action: 'ADD' | 'REMOVE'): Promise<void> {
+  private async propagateToFiles(files: FileEntity[], permission: Permission, action: PermissionAction): Promise<void> {
     const operations = files.map((file) => {
       const fileId = file._id.toString();
 
-      if (action === 'ADD') {
+      if (action === PermissionAction.ADD) {
         return this.shouldUpgrade(file.permissions, permission)
           ? this.fileRepository.addPermission(fileId, permission)
           : Promise.resolve();
@@ -102,12 +102,12 @@ export class AclService {
     folders: FolderEntity[],
     ownerId: string,
     permission: Permission,
-    action: 'ADD' | 'REMOVE'
+    action: PermissionAction
   ): Promise<void> {
     const operations = folders.map(async (folder) => {
       const folderId = folder._id.toString();
 
-      if (action === 'ADD') {
+      if (action === PermissionAction.ADD) {
         if (this.shouldUpgrade(folder.permissions, permission)) {
           await this.folderRepository.addPermission(folderId, permission);
         }

@@ -1,25 +1,21 @@
 import { PermissionRole } from '@LucidRF/common';
 import { ShareResourcePayload, UnshareResourcePayload } from '@LucidRF/files-contracts';
 import { Injectable } from '@nestjs/common';
-
+import { AccessLevel, PermissionAction, ResourceType } from './domain/enums';
 import { FileRepository } from './domain/file.repository';
 import { FolderRepository } from './domain/folder.repository';
-import { AclService } from './services/acl.service';
-import { FileService } from './services/file.service';
-import { FolderService } from './services/folder.service';
+import { AclService } from './services';
 
 @Injectable()
 export class FilesService {
   constructor(
-    public readonly file: FileService,
-    public readonly folder: FolderService,
-    private readonly acl: AclService,
+    private readonly aclService: AclService,
     private readonly fileRepo: FileRepository,
     private readonly folderRepo: FolderRepository
   ) {}
 
   async shareFile(payload: ShareResourcePayload) {
-    await this.file.verifyOwner(payload.resourceId, payload.userId);
+    await this.aclService.validateAccess(payload.resourceId, payload.userId, ResourceType.FILE, AccessLevel.OWNER);
 
     return this.fileRepo.addPermission(payload.resourceId, {
       subjectId: payload.subjectId,
@@ -29,7 +25,7 @@ export class FilesService {
   }
 
   async shareFolder(payload: ShareResourcePayload) {
-    await this.folder.verifyOwner(payload.resourceId, payload.userId);
+    await this.aclService.validateAccess(payload.resourceId, payload.userId, ResourceType.FOLDER, AccessLevel.OWNER);
 
     const permission = {
       subjectId: payload.subjectId,
@@ -39,25 +35,41 @@ export class FilesService {
 
     const updated = await this.folderRepo.addPermission(payload.resourceId, permission);
 
-    // Propagate
-    await this.acl.propagatePermissionChange(payload.resourceId, payload.userId, permission, 'ADD');
+    // Propagate Change (Recursive)
+    await this.aclService.propagatePermissionChange(
+      payload.resourceId,
+      payload.userId,
+      permission,
+      PermissionAction.ADD
+    );
 
     return updated;
   }
 
   async unshareFile(payload: UnshareResourcePayload) {
-    await this.file.verifyOwner(payload.resourceId, payload.userId);
+    await this.aclService.validateAccess(payload.resourceId, payload.userId, ResourceType.FILE, AccessLevel.OWNER);
+
     return this.fileRepo.removePermission(payload.resourceId, payload.subjectId, payload.subjectType);
   }
 
   async unshareFolder(payload: UnshareResourcePayload) {
-    await this.folder.verifyOwner(payload.resourceId, payload.userId);
+    await this.aclService.validateAccess(payload.resourceId, payload.userId, ResourceType.FOLDER, AccessLevel.OWNER);
 
     const updated = await this.folderRepo.removePermission(payload.resourceId, payload.subjectId, payload.subjectType);
-    const dummyPerm = { subjectId: payload.subjectId, subjectType: payload.subjectType, role: PermissionRole.VIEWER };
 
-    // Propagate Removal
-    await this.acl.propagatePermissionChange(payload.resourceId, payload.userId, dummyPerm, 'REMOVE');
+    // Propagate Removal (Recursive)
+    const permission = {
+      subjectId: payload.subjectId,
+      subjectType: payload.subjectType,
+      role: PermissionRole.VIEWER,
+    };
+
+    await this.aclService.propagatePermissionChange(
+      payload.resourceId,
+      payload.userId,
+      permission,
+      PermissionAction.REMOVE
+    );
 
     return updated;
   }
