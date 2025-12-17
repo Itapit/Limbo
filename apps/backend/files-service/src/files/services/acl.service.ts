@@ -103,20 +103,9 @@ export class AclService {
     permission: PermissionEntity,
     action: PermissionAction
   ): Promise<void> {
-    for (const folder of folders) {
-      const folderId = folder._id.toString();
+    await this.updateFoldersBulk(folders, permission, action);
 
-      // Step A: Update the folder itself
-      if (action === PermissionAction.ADD) {
-        if (shouldUpgradePermission(folder.permissions, permission)) {
-          await this.folderRepository.addPermission(folderId, permission);
-        }
-      } else {
-        await this.folderRepository.removePermission(folderId, permission.subjectId, permission.subjectType);
-      }
-
-      await this.propagatePermissionChange(folderId, ownerId, permission, action);
-    }
+    await this.recurseIntoSubfolders(folders, ownerId, permission, action);
   }
 
   // =================================================================================================
@@ -135,5 +124,47 @@ export class AclService {
     }
 
     return resource;
+  }
+
+  private async updateFoldersBulk(
+    folders: FolderEntity[],
+    permission: PermissionEntity,
+    action: PermissionAction
+  ): Promise<void> {
+    const bulkOperations: BulkPermissionOperation[] = [];
+
+    for (const folder of folders) {
+      let shouldProcess = false;
+
+      if (action === PermissionAction.REMOVE) {
+        shouldProcess = true;
+      } else {
+        shouldProcess = shouldUpgradePermission(folder.permissions, permission);
+      }
+
+      if (shouldProcess) {
+        bulkOperations.push({
+          resourceId: folder._id.toString(),
+          action,
+          permission,
+        });
+      }
+    }
+
+    if (bulkOperations.length > 0) {
+      this.logger.log(`Bulk updating permissions for ${bulkOperations.length} folders`);
+      await this.folderRepository.updatePermissionsBulk(bulkOperations);
+    }
+  }
+
+  private async recurseIntoSubfolders(
+    folders: FolderEntity[],
+    ownerId: string,
+    permission: PermissionEntity,
+    action: PermissionAction
+  ): Promise<void> {
+    for (const folder of folders) {
+      await this.propagatePermissionChange(folder._id.toString(), ownerId, permission, action);
+    }
   }
 }

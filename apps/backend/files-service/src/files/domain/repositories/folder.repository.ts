@@ -1,4 +1,5 @@
 import { PermissionType } from '@LucidRF/common';
+import { BulkPermissionOperation } from '../dtos';
 import { CreateFolderRepoDto } from '../dtos/create-folder-repository.dto';
 import { FolderEntity, PermissionEntity } from '../entities';
 
@@ -44,4 +45,9 @@ export abstract class FolderRepository {
    * Revokes access for a specific subject by removing their permission entry.
    */
   abstract removePermission(id: string, subjectId: string, subjectType: PermissionType): Promise<FolderEntity>;
+
+  /**
+   * Update permission in bulk for multiple folders.
+   */
+  abstract updatePermissionsBulk(operations: BulkPermissionOperation[]): Promise<void>;
 }
