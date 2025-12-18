@@ -117,7 +117,7 @@ export class MongoFileRepository implements FileRepository {
     const bulkOps: AnyBulkWriteOperation<FileSchema>[] = [];
 
     for (const op of operations) {
-      if (op.action === PermissionAction.ADD) {
+      if (op.action === PermissionAction.ADD || op.action === PermissionAction.UPDATE) {
         bulkOps.push(...this.createAddOperations(op));
       } else {
         bulkOps.push(this.createRemoveOperation(op));

@@ -86,10 +86,21 @@ export function calculateBulkUpdates(
   for (const resource of resources) {
     let shouldProcess = false;
 
-    if (action === PermissionAction.REMOVE) {
-      shouldProcess = true;
-    } else {
-      shouldProcess = shouldUpgradePermission(resource.permissions, permission);
+    switch (action) {
+      case PermissionAction.REMOVE:
+        shouldProcess = true;
+        break;
+
+      case PermissionAction.UPDATE:
+        // Force Update: We don't care about weights.
+        // If the user is an EDITOR and we say VIEWER, they become VIEWER.
+        shouldProcess = true;
+        break;
+
+      case PermissionAction.ADD:
+        // Safe Add: Only process if it upgrades access (prevents accidental downgrades)
+        shouldProcess = shouldUpgradePermission(resource.permissions, permission);
+        break;
     }
 
     if (shouldProcess) {
@@ -102,4 +113,19 @@ export function calculateBulkUpdates(
   }
 
   return operations;
+}
+
+/**
+ * Determines the correct action based on whether the user already exists.
+ * - If user exists: Returns UPDATE (Allows downgrades/changes).
+ * - If user is new: Returns ADD (Safe add, prevents accidental downgrades on children).
+ */
+export function determineSharingAction(
+  currentPermissions: PermissionEntity[] = [],
+  recipientId: string,
+  recipientType: PermissionType = PermissionType.USER
+): PermissionAction {
+  const exists = currentPermissions.find((p) => p.subjectId === recipientId && p.subjectType === recipientType);
+
+  return exists ? PermissionAction.UPDATE : PermissionAction.ADD;
 }

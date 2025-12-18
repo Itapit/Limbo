@@ -97,7 +97,7 @@ export class MongoFolderRepository implements FolderRepository {
     const bulkOps: AnyBulkWriteOperation<FolderSchema>[] = [];
 
     for (const op of operations) {
-      if (op.action === PermissionAction.ADD) {
+      if (op.action === PermissionAction.ADD || op.action === PermissionAction.UPDATE) {
         bulkOps.push(...this.createAddOperations(op));
       } else {
         bulkOps.push(this.createRemoveOperation(op));

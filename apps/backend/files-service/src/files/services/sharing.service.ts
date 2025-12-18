@@ -1,7 +1,9 @@
 import { PermissionRole } from '@LucidRF/common';
 import { ShareResourcePayload, UnshareResourcePayload } from '@LucidRF/files-contracts';
 import { Injectable } from '@nestjs/common';
+import { FolderEntity } from '../domain/entities';
 import { AccessLevel, PermissionAction, ResourceType } from '../domain/enums';
+import { determineSharingAction } from '../domain/logic';
 import { FileRepository, FolderRepository } from '../domain/repositories';
 import { AclService } from './acl.service';
 
@@ -24,7 +26,14 @@ export class SharingService {
   }
 
   async shareFolder(payload: ShareResourcePayload) {
-    await this.aclService.validateAccess(payload.resourceId, payload.userId, ResourceType.FOLDER, AccessLevel.OWNER);
+    const folder = (await this.aclService.validateAccess(
+      payload.resourceId,
+      payload.userId,
+      ResourceType.FOLDER,
+      AccessLevel.OWNER
+    )) as FolderEntity;
+
+    const action = determineSharingAction(folder.permissions, payload.subjectId, payload.subjectType);
 
     const permission = {
       subjectId: payload.subjectId,
@@ -35,12 +44,7 @@ export class SharingService {
     const updated = await this.folderRepo.addPermission(payload.resourceId, permission);
 
     // Propagate Change (Recursive)
-    await this.aclService.propagatePermissionChange(
-      payload.resourceId,
-      payload.userId,
-      permission,
-      PermissionAction.ADD
-    );
+    await this.aclService.propagatePermissionChange(payload.resourceId, payload.userId, permission, action);
 
     return updated;
   }
