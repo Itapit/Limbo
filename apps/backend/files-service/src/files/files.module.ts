@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { STORAGE_BUCKET_NAME } from '../storage/storage.constants';
 import { StorageModule } from '../storage/storage.module';
+import { AclService, FileService, FolderService, PermissionPropagationService, SharingService } from './application';
 import { FileRepository, FolderRepository } from './domain/repositories';
 import { TransactionManager } from './domain/transaction.manager';
 import { FilesController } from './files.controller';
@@ -10,7 +11,6 @@ import { DatabaseContext } from './infrastructure/persistence/database.context';
 import { MongoTransactionManager } from './infrastructure/persistence/mongo-transaction.manager';
 import { MongoFileRepository, MongoFolderRepository } from './infrastructure/repositories';
 import { FileSchema, FileSchemaFactory, FolderSchema, FolderSchemaFactory } from './infrastructure/schemas';
-import { AclService, FileService, FolderService, PermissionPropagationService, SharingService } from './services';
 
 @Module({
   imports: [

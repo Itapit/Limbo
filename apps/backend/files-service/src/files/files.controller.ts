@@ -11,8 +11,8 @@ import {
 } from '@LucidRF/files-contracts';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { FileService, FolderService } from './services';
-import { SharingService } from './services/sharing.service';
+import { FileService, FolderService } from './application';
+import { SharingService } from './application/sharing.service';
 
 @Controller('files')
 export class FilesController {
