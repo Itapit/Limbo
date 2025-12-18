@@ -5,9 +5,9 @@ import {
   GetDownloadUrlPayload,
   InitializeUploadPayload,
 } from '@LucidRF/files-contracts';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { STORAGE_BUCKET_NAME } from '../../storage/storage.constants';
 import { StorageService } from '../../storage/storage.service';
 import { CreateFileRepoDto } from '../domain/dtos';
 import { FileEntity, FolderEntity, PermissionEntity, toFileDto } from '../domain/entities';
@@ -19,16 +19,13 @@ import { AclService } from './acl.service';
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
-  private readonly bucketName: string;
 
   constructor(
     private readonly fileRepository: FileRepository,
     private readonly storageService: StorageService,
     private readonly aclService: AclService,
-    private readonly configService: ConfigService
-  ) {
-    this.bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
-  }
+    @Inject(STORAGE_BUCKET_NAME) private readonly bucketName: string
+  ) {}
 
   async initializeUpload(payload: InitializeUploadPayload) {
     const { userId, originalFileName, parentFolderId } = payload;

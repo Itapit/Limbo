@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { STORAGE_BUCKET_NAME } from '../storage/storage.constants';
 import { StorageModule } from '../storage/storage.module';
 import { FileRepository, FolderRepository } from './domain/repositories';
 import { TransactionManager } from './domain/transaction.manager';
@@ -39,6 +40,13 @@ import { AclService, FileService, FolderService, PermissionPropagationService, S
     {
       provide: FolderRepository,
       useClass: MongoFolderRepository,
+    },
+    {
+      provide: STORAGE_BUCKET_NAME,
+      useFactory: (configService: ConfigService) => {
+        return configService.getOrThrow<string>('MINIO_BUCKET_NAME');
+      },
+      inject: [ConfigService],
     },
   ],
 })
