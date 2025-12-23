@@ -1,3 +1,4 @@
+import { GroupDto } from '@LucidRF/common';
 import { GROUPS_PATTERNS, GROUPS_SERVICE } from '@LucidRF/groups-contracts';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -25,11 +26,10 @@ export class TcpGroupsService implements GroupsService {
     }
 
     try {
-      const response = await firstValueFrom(
-        this.client.send(GROUPS_PATTERNS.GET_USER_GROUPS, { userId }).pipe(timeout(GROUPS_REQUEST_TIMEOUT))
+      const groups = await firstValueFrom(
+        this.client.send<GroupDto[]>(GROUPS_PATTERNS.GET_USER_GROUPS, userId).pipe(timeout(GROUPS_REQUEST_TIMEOUT))
       );
-
-      const groupIds = response || [];
+      const groupIds = groups?.map((g) => g.id) || [];
 
       await this.cacheManager.set(cacheKey, groupIds);
 
