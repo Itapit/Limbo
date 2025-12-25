@@ -1,12 +1,12 @@
 import { UserDto, UserStatus } from '@LucidRF/common';
 import { AdminCreateUserPayload } from '@LucidRF/users-contracts';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices'; // <-- 1. Import RpcException
+import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
-import { HASH_ROUNDS } from '../constants';
-import { CreateUserRepoDto } from './dtos/create-user-repo.dto';
-import { UserRepository } from './repository/user.repository';
-import { UserSchema } from './repository/user.schema';
+import { HASH_ROUNDS } from '../../constants';
+import { CreateUserRepoDto } from '../domain/dtos';
+import { UserRepository } from '../domain/interfaces';
+import { toUserDto } from '../domain/mappers';
 
 @Injectable()
 export class UserService {
@@ -36,7 +36,7 @@ export class UserService {
     // TODO: add email or smthing
     Logger.log(`Temp password for ${payload.email}: ${tempPassword}`);
 
-    return this.mapToDto(newUserEntity);
+    return toUserDto(newUserEntity);
   }
 
   /**
@@ -48,23 +48,10 @@ export class UserService {
       const error = new NotFoundException('User not found');
       throw new RpcException(error.getResponse());
     }
-    return this.mapToDto(user);
+    return toUserDto(user);
   }
 
   private generateTempPassword(): string {
     return Math.random().toString(36).slice(-8);
-  }
-
-  /**
-   * Maps the internal UserSchema entity to the safe, public UserDto.
-   */
-  private mapToDto(user: UserSchema): UserDto {
-    return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      status: user.status,
-    };
   }
 }
