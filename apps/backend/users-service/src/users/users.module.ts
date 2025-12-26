@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SecurityModule } from '../security/security.module';
 import { UserService } from './application';
 import { UserRepository } from './domain';
 import { MongoUserRepository } from './infrastructure/repositories';
@@ -7,7 +8,15 @@ import { UserSchema, UserSchemaFactory } from './infrastructure/schemas';
 import { UserController } from './users.controller';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: UserSchema.name, schema: UserSchemaFactory }])],
+  imports: [
+    SecurityModule,
+    MongooseModule.forFeature([
+      {
+        name: UserSchema.name,
+        schema: UserSchemaFactory,
+      },
+    ]),
+  ],
   providers: [
     UserService,
     {

@@ -2,13 +2,12 @@ import { UserDto, UserStatus } from '@LucidRF/common';
 import { AdminCreateUserPayload } from '@LucidRF/users-contracts';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import * as bcrypt from 'bcrypt';
-import { HASH_ROUNDS } from '../../constants';
+import { PasswordService } from '../../security/interfaces';
 import { CreateUserRepoDto, toUserDto, UserRepository } from '../domain';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository, private readonly passwordService: PasswordService) {}
 
   /**
    * Creates a new user with a pending status and a temporary password.
@@ -20,8 +19,8 @@ export class UserService {
       throw new RpcException(error.getResponse());
     }
 
-    const tempPassword = this.generateTempPassword();
-    const hashedPassword = await bcrypt.hash(tempPassword, HASH_ROUNDS);
+    const tempPassword = this.passwordService.generateTemporary();
+    const hashedPassword = await this.passwordService.hash(tempPassword);
 
     const repoDto: CreateUserRepoDto = {
       email: payload.email,
@@ -47,9 +46,5 @@ export class UserService {
       throw new RpcException(error.getResponse());
     }
     return toUserDto(user);
-  }
-
-  private generateTempPassword(): string {
-    return Math.random().toString(36).slice(-8);
   }
 }
