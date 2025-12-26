@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
-import { SecurityModule } from '../security/security.module';
+import { SecurityModule } from '../security';
 import { UserModule } from '../users/users.module';
 import { AuthService } from './application';
 import { AuthController } from './auth.controller';

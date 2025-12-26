@@ -2,7 +2,7 @@ import { UserDto, UserStatus } from '@LucidRF/common';
 import { AdminCreateUserPayload } from '@LucidRF/users-contracts';
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { PasswordService } from '../../security/interfaces';
+import { PasswordService } from '../../security';
 import { CreateUserRepoDto, toUserDto, UserRepository } from '../domain';
 
 @Injectable()

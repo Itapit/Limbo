@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SecurityModule } from '../security/security.module';
+import { SecurityModule } from '../security';
 import { UserService } from './application';
 import { UserRepository } from './domain';
 import { MongoUserRepository } from './infrastructure/repositories';

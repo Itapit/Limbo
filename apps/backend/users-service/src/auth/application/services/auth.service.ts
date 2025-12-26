@@ -17,7 +17,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import { PasswordService } from '../../../security/interfaces';
+import { PasswordService } from '../../../security';
 import { toUserDto, UserEntity, UserRepository } from '../../../users/domain';
 import { RefreshTokenRepository, TokenSecurityService, TokenService } from '../../domain';
 
