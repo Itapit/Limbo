@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { UserRole, UserStatus } from '@LucidRF/common';
+import { UserStatus } from '@LucidRF/common';
 import {
   AuthLoginPayload,
   AuthLoginResponseDto,
@@ -7,45 +6,31 @@ import {
   AuthLogoutPayload,
   AuthRefreshPayload,
   CompleteSetupPayload,
-  JWT_ACCESS_EXPIRES_IN,
-  JWT_PENDING_EXPIRES_IN,
-  JWT_REFRESH_EXPIRES_IN,
-  JWT_SECRET,
   PendingLoginResponseDto,
 } from '@LucidRF/users-contracts';
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
-import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
-import { HASH_ROUNDS } from '../../constants';
-import { UserEntity } from '../../users/domain/entities';
-import { UserRepository } from '../../users/domain/interfaces/user.repository.interface';
-import { toUserDto } from '../../users/domain/mappers';
-import { RefreshTokenRepository } from '../domain/interfaces/refresh-token.repository.interface';
-import { toRefreshTokenDto } from '../domain/mappers';
-import { TokenSecurityService } from '../domain/services/security.service';
-import ms = require('ms');
+import { UserEntity } from '../../../users/domain/entities';
+import { UserRepository } from '../../../users/domain/interfaces';
+import { toUserDto } from '../../../users/domain/mappers';
+import { PasswordService, RefreshTokenRepository, TokenService } from '../../domain/interfaces';
+import { TokenSecurityService } from '../../domain/services';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersRepository: UserRepository,
-    private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
     private readonly tokenSecurity: TokenSecurityService,
     private readonly refreshTokenRepo: RefreshTokenRepository,
-    @Inject(JWT_REFRESH_EXPIRES_IN) private readonly jwtRefreshExpiresIn: string,
-    @Inject(JWT_PENDING_EXPIRES_IN) private readonly jwtPendingExpiresIn: string,
-    @Inject(JWT_ACCESS_EXPIRES_IN) private readonly jwtAccessExpiresIn: string,
-    @Inject(JWT_SECRET) private readonly jwtSecret: string
+    private readonly tokenService: TokenService
   ) {}
 
   /**
@@ -78,8 +63,7 @@ export class AuthService {
     if (user.status !== UserStatus.PENDING) {
       throw new RpcException(new ForbiddenException('User is already active').getResponse());
     }
-
-    const hashedPassword = await bcrypt.hash(password, HASH_ROUNDS);
+    const hashedPassword = await this.passwordService.hash(password);
     const updatedUser = await this.usersRepository.update(user.id, {
       password: hashedPassword,
       status: UserStatus.ACTIVE,
@@ -144,7 +128,8 @@ export class AuthService {
    */
   async validateUser(email: string, pass: string): Promise<UserEntity | null> {
     const user = await this.usersRepository.findByEmailWithCredentials(email);
-    if (user && user.password && (await bcrypt.compare(pass, user.password))) {
+
+    if (user && user.password && (await this.passwordService.compare(pass, user.password))) {
       return user;
     }
     return null;
@@ -154,14 +139,7 @@ export class AuthService {
    * Issues a short-lived token for password setup.
    */
   private async grantPendingToken(user: UserEntity): Promise<PendingLoginResponseDto> {
-    const payload = {
-      sub: user.id,
-      status: UserStatus.PENDING,
-    };
-
-    const token = await this.jwtService.signAsync(payload, {
-      expiresIn: this.jwtPendingExpiresIn as any,
-    });
+    const token = await this.tokenService.generatePendingToken(user.id);
     return { pendingToken: token };
   }
 
@@ -170,47 +148,18 @@ export class AuthService {
    */
   private async grantUserTokens(user: UserEntity, userAgent?: string): Promise<AuthLoginResponseDto> {
     try {
-      const jti = uuidv4();
-      const expiresInMs = ms(this.jwtRefreshExpiresIn as any) as unknown as number;
-      const expiresAt = new Date(Date.now() + expiresInMs);
+      const tokens = await this.tokenService.generateAuthTokens(user.id, user.role);
 
-      // Create returns a RefreshTokenEntity
-      const newSession = await this.refreshTokenRepo.create(user.id, jti, expiresAt, userAgent);
-
-      const [accessToken] = await Promise.all([
-        this.signAccessToken(user.id, user.role),
-        this.signRefreshToken(user.id, jti),
-      ]);
+      await this.refreshTokenRepo.create(user.id, tokens.jti, tokens.refreshToken.expiresAt, userAgent);
 
       return {
-        accessToken,
-        refreshToken: toRefreshTokenDto(newSession) as any,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
         user: toUserDto(user),
       };
     } catch (e) {
       Logger.error('Failed to grant user tokens:', e);
-      const error = new InternalServerErrorException('Could not grant tokens');
-      throw new RpcException(error.getResponse());
+      throw new RpcException(new InternalServerErrorException('Could not grant tokens').getResponse());
     }
-  }
-
-  // --- Token Signing Helpers ---
-
-  private signAccessToken(userId: string, role: UserRole): Promise<string> {
-    const payload = { sub: userId, role };
-
-    return this.jwtService.signAsync(payload, {
-      secret: this.jwtSecret,
-      expiresIn: this.jwtAccessExpiresIn as any,
-    });
-  }
-
-  private signRefreshToken(userId: string, jti: string): Promise<string> {
-    const payload = { sub: userId, jti: jti };
-
-    return this.jwtService.signAsync(payload, {
-      secret: this.jwtSecret,
-      expiresIn: this.jwtRefreshExpiresIn as any,
-    });
   }
 }
