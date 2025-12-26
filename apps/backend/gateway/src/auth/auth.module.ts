@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService, CookieService } from './services';
 import { AccessJwtStrategy, PendingJwtStrategy, RefreshTokenStrategy } from './strategies';
 
 @Module({
@@ -52,6 +52,7 @@ import { AccessJwtStrategy, PendingJwtStrategy, RefreshTokenStrategy } from './s
       },
       inject: [ConfigService],
     },
+    CookieService,
   ],
   exports: [PassportModule],
 })
