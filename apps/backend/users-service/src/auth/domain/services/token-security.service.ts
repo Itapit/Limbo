@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../../users/domain';
 import { RefreshTokenEntity } from '../entities';
 import { InvalidTokenException, TokenReuseException } from '../exceptions';
 import { RefreshTokenRepository } from '../interfaces';
 
 @Injectable()
 export class TokenSecurityService {
-  constructor(
-    private readonly refreshTokenRepo: RefreshTokenRepository,
-    private readonly usersRepository: UserRepository
-  ) {}
+  constructor(private readonly refreshTokenRepo: RefreshTokenRepository) {}
 
   /**
    * Enforces the Refresh Token Rotation policy:
@@ -21,18 +17,20 @@ export class TokenSecurityService {
   async validateAndRotate(jti: string, userId: string): Promise<void> {
     const session = await this.refreshTokenRepo.findByJti(jti);
 
-    // REUSE DETECTION (Security Policy)
     if (!session) {
+      throw new InvalidTokenException('Refresh token not found');
+    }
+
+    // REUSE DETECTION -> The Token exists, but was already used
+    if (session.isRevoked) {
       await this.handleTokenReuse(userId);
       return;
     }
 
-    //VALIDATION (Business Rules)
     await this.validateSession(session, userId);
 
-    // ROTATION (State Mutation)
-    // We delete the token immediately to ensure it can never be used again.
-    await this.refreshTokenRepo.delete(session.jti);
+    // ROTATION (stamp the token as used)
+    await this.refreshTokenRepo.revokeToken(session.jti);
   }
 
   // --- Private Policy Implementations ---

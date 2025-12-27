@@ -2,6 +2,7 @@ export class RefreshTokenEntity {
   id: string;
   userId: string;
   jti: string;
+  isRevoked: boolean;
   expiresAt: Date;
   userAgent?: string;
   createdAt?: Date;

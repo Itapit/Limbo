@@ -10,6 +10,7 @@ export function toRefreshTokenEntity(doc: RefreshTokenDocument): RefreshTokenEnt
     id: obj._id.toString(), // Explicitly convert _id to string id
     userId: obj.userId.toString(), // Convert relational ObjectId to string
     jti: obj.jti,
+    isRevoked: obj.isRevoked,
     expiresAt: obj.expiresAt,
     userAgent: obj.userAgent,
     createdAt: obj.createdAt,

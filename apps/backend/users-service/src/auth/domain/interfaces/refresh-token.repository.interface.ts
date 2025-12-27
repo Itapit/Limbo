@@ -20,4 +20,9 @@ export abstract class RefreshTokenRepository {
    * Deletes all refresh tokens for a specific user (for "log out everywhere").
    */
   abstract deleteAllForUser(userId: string): Promise<void>;
+
+  /**
+   * Revokes a token by its JTI.
+   */
+  abstract revokeToken(jti: string): Promise<void>;
 }

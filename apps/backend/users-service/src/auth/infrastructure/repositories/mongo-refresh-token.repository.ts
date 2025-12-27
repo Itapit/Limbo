@@ -34,4 +34,8 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
   async deleteAllForUser(userId: string): Promise<void> {
     await this.refreshTokenModel.deleteMany({ userId }).exec();
   }
+
+  async revokeToken(jti: string): Promise<void> {
+    await this.refreshTokenModel.updateOne({ jti }, { $set: { isRevoked: true } }).exec();
+  }
 }

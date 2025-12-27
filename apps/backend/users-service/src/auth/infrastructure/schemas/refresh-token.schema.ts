@@ -19,6 +19,9 @@ export class RefreshTokenSchema extends Document {
   @Prop({ type: String, required: true, unique: true, index: true })
   jti: string;
 
+  @Prop({ default: false })
+  isRevoked: boolean;
+
   @Prop({ type: Date, required: true })
   expiresAt: Date;
 
